@@ -24,6 +24,7 @@
 using namespace std;
 using namespace cv;
 
+// Подключение haarcascade 
 String face_cascade_name = "C:\\Users\\micha_000\\Desktop\\Pr.Alizee\\AlizeeQt\\haarcascade_face_alt2.xml";
 String eye_cascade_name = "C:\\Users\\micha_000\\Desktop\\Pr.Alizee\\AlizeeQt\\haarcascade_eyes.xml";
 
