@@ -35,47 +35,11 @@ String eye_cascade_name = "C:\\Users\\micha_000\\Desktop\\Pr.Alizee\\AlizeeQt\\h
 CascadeClassifier face_cascade;
 CascadeClassifier eye_cascade;
 
-int detectEye(Mat& im, Mat& tpl, Rect& rect)
-{
-    vector<Rect> faces, eyes;
-    face_cascade.detectMultiScale(im, faces, 1.1, 2, 0 | CV_HAAR_SCALE_IMAGE, Size(30, 30));
+void detectAndDisplay(Mat frame);
 
-    for (size_t i = 0; i < faces.size(); i++)
-    {
-        Mat face = im(faces[i]);
-        eye_cascade.detectMultiScale(face, eyes, 1.1, 2, 0 | CV_HAAR_SCALE_IMAGE, Size(20, 20));
-
-        if (eyes.size())
-        {
-            rect = eyes[0] + Point(faces[i].x, faces[i].y);
-            tpl = im(rect);
-        }
-    }
-    return eyes.size();
-}
-
-void trackEye(Mat& im, Mat& tpl, Rect& rect)
-{
-    Size size(rect.width * 2, rect.height * 2);
-    Rect window(rect + size - Point(size.width / 2, size.height / 2));
-
-    window &= Rect(0, 0, im.cols, im.rows);
-
-    Mat dst(window.width - tpl.rows + 1, window.height - tpl.cols + 1, CV_32FC1);
-    matchTemplate(im(window), tpl, dst, CV_TM_SQDIFF_NORMED);
-
-    double minval, maxval;
-    Point minloc, maxloc;
-    minMaxLoc(dst, &minval, &maxval, &minloc, &maxloc);
-
-    if (minval <= 0.2)
-    {
-        rect.x = window.x + minloc.x;
-        rect.y = window.y + minloc.y;
-    }
-    else
-        rect.x = rect.y = rect.width = rect.height = 0;
-}
+RNG rng(12345);
+Mat debugImage;
+Mat skinCrCbHist = Mat::zeros(Size(256, 256), CV_8UC1);
 
 
 /*
@@ -90,6 +54,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     // Открытие первой веб-камеры
     capWebcam.open(0);
 
+    // Сообщения о отсутствии face_cascade или eye_cascade
     if( !face_cascade.load( face_cascade_name ) ) {QMessageBox::critical(this, "Ошибка!", "Ошибка загрузки face_cascade", QMessageBox::Ok); return; };
     if( !eye_cascade.load( eye_cascade_name ) ){QMessageBox::critical(this, "Ошибка!", "Ошибка загрузки eye_cascade", QMessageBox::Ok); return; };
 
@@ -101,10 +66,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
         return; // выход
     }
 
+    createCornerKernels();
+
+    ellipse(skinCrCbHist, Point(113, 155.6), Size(23.4, 15.2),
+            43.0, 0.0, 360.0, Scalar(255, 255, 255), -1);
+
+    // Инициализация таймера с обновлением в 60мс.
     tmrTimer = new QTimer(this);
-
     connect(tmrTimer, SIGNAL(timeout()), this, SLOT(processFrameAndUpdateGUI()));
-
     tmrTimer->start(60);
 }
 
@@ -143,16 +112,146 @@ void MainWindow::displayAndUpdateRectangle()
 
     cvtColor(matOriginal, gray, CV_BGR2RGB);
 
-    if (eye_bb.width == 0 && eye_bb.height == 0)
+    releaseCornerKernels();
+}
+
+void findEyes(Mat frame_gray, Rect face)
+{
+    Mat faceROI = framge_gray(face);
+
+    if (smoothFaceImage)
     {
-        detectEye(gray, eye_tpl, eye_bb);
+        double sigma = smoothFaceFactor * face.width;
+        GaussianBlur(faceROI, faceROI, Size(0, 0), sigma);
+    }
 
-    } else {
+    // -- Поиск региона глаз и отрисовка
+    int eye_region_width = face.width * (eyePercentHeight / 100.0);
+    int eye_region_height = face.height * (eyePercentHeight / 100.0);
+    int eye_region_top = face.height * (eyePercentTop / 100.0);
 
-        trackEye(gray, eye_tpl, eye_bb);
+    Rect leftEyeRegion(face.width * (eyePercentSide / 100.0),
+                       eye_region_top, eye_region_width, eye_region_height);
 
-        rectangle(matOriginal, eye_bb, CV_RGB(0, 255, 0));
+    Rect rightEyeRegion(face.width - eye_region_width - face.width * (eyePercentSide / 100.0),
+                        eye_region_top, eye_region_width, eye_region_height);
 
+    // -- Поиск центра глаза
+    Point leftPupil = findEyeCenter(faceROI, leftEyeRegion, "Left Eye");
+    Point rightPupil = findEyeCenter(faceROI, rightEyeRegion, "Right Eye");
+
+    // -- Получаем регионы углов
+    Rect leftRightCornerRegion(leftEyeRegion);
+    leftRightCornerRegion.width -= leftPupil.x;
+    leftRightCornerRegion.x += leftPupil.x;
+    leftRightCornerRegion.height /= 2;
+    leftRightCornerRegion.y += leftRightCornerRegion.height / 2;
+
+    Rect leftLeftCornerRegion(leftEyeRegion);
+    leftLeftCornerRegion.width = leftPupil.x;
+    leftLeftCornerRegion.height /= 2;
+    leftLeftCornerRegion.y += leftLeftCornerRegion.height / 2;
+
+    Rect rightLeftCornerRegion(rightEyeRegion);
+    rightLeftCornerRegion.width = rightPupil.x;
+    rightLeftCornerRegion.height /= 2;
+    rightLeftCornerRegion.y += rightLeftCornerRegion.height / 2;
+
+    Rect rightRightCornerRegion(rightEyeRegion);
+    rightRightCornerRegion.width -= rightPupil.x;
+    rightRightCornerRegion.x += rightPupil.x;
+    rightRightCornerRegion.height /= 2;
+    rightRightCornerRegion.y += rightRightCornerRegion.height / 2;
+
+    rectangle(debugFace,leftRightCornerRegion,200);
+    rectangle(debugFace,leftLeftCornerRegion,200);
+    rectangle(debugFace,rightLeftCornerRegion,200);
+    rectangle(debugFace,rightRightCornerRegion,200);
+
+    // -- Смена координат центра глаз относительно лица
+    rightPupil.x += rightEyeRegion.x;
+    rightPupil.y += rightEyeRegion.y;
+    leftPupil.x += leftEyeRegion.x;
+    leftPupil.y += leftEyeRegion.y;
+
+    // Отрисовка центра глаз
+    circle(debugFace, rightPupil, 3, 1234);
+    circle(debugFace, leftPupil, 3, 1234);
+
+    // Поиск угла глаз
+    if (enableEyeCorner)
+    {
+        Point2f leftRightCorner = fingEyeCorner(faceROI(leftRightCornerRegion), true, false);
+        leftRightCorner.x += leftRightCornerRegion.x;
+        leftRightCorner.y += leftRightCornerRegion.y;
+
+        Point2f leftLeftCorner = findEyeCorner(faceROI(leftLeftCornerRegion), true, true);
+        leftLeftCorner.x += leftLeftCornerRegion.x;
+        leftLeftCorner.y += leftLeftCornerRegion.y;
+
+        Point2f rightLeftCorner = findEyeCorner(faceROI(rightLeftCornerRegion), false, true);
+        rightLeftCorner.x += rightLeftCornerRegion.x;
+        rightLeftCorner.y += rightLeftCornerRegion.y;
+
+        Point2f rightRightCorner = findEyeCorner(faceROI(rightRightCornerRegion), false, false);
+        rightRightCorner.x += rightRightCornerRegion.x;
+        rightRightCorner.y += rightRightCornerRegion.y;
+
+        circle(faceROI, leftRightCorner, 3, 200);
+        circle(faceROI, leftLeftCorner, 3, 200);
+        circle(faceROI, rightLeftCorner, 3, 200);
+        circle(faceROI, rightRightCorner, 3, 200);
+    }
+
+}
+
+Mat findSkin (mat &frame)
+{
+    Mat input;
+    Mat output = Mat(frame.rows, frame.cols, CV_8U);
+
+    cvtColor(frame, input, CV_BGR2YCrCb);
+
+    for (int y = 0; y < input.rows, ++y)
+    {
+        const Vec3b *Mr = input.ptr<Vec3b>(y);
+        Vec3b *Or = frame.ptr<Vec3b>(y);
+
+        for (int x = 0; x < input.cols; ++x)
+        {
+            Vec3b ycrcb = Mr[x];
+
+            if (skinCrCbHist.at<uchar>(ycrcb[1], ycrcb[2]) == 0)
+            {
+                Or[x] = Vec3b(0, 0, 0);
+            }
+        }
+    }
+
+    return output;
+}
+
+/*
+ *  @function detectAndDisplay
+ */
+void detectAndDisplay(Mat frame)
+{
+    vector<Rect> faces;
+
+    vector<Mat> rgbChannels(3);
+    split(frame, rgbChannels);
+    Mat frame_gray = rgbChannels[2];
+
+    face_cascade.detectMultiScale(frame_gray, faces, 1.1, 2, 0|CV_HAAR_SCALE_IMAGE|CV_HAAR_FIND_BIGGEST_OBJECT, Size(150, 150));
+
+    for (int i = 0; i < faces.size(); i++)
+    {
+        rectangle(debugImage, faces[i], 1234);
+    }
+
+    if (faces.size() > 0)
+    {
+        findEyes(frame_gray, faces[0]);
     }
 }
 
