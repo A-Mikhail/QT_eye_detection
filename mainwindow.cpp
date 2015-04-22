@@ -21,6 +21,10 @@
 #include "ui_mainwindow.h"
 #include "aboutwindow.h"
 
+#include "constants.h"
+#include "findeyecenter.h"
+#include "findeyecorner.h"
+
 using namespace std;
 using namespace cv;
 

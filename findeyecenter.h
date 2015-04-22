@@ -25,7 +25,7 @@
 class findEyeCenter
 {
 public slots:
-    cv::Point findEyeCenter(cv::Mat face, cv::Rect eye, std::string debugWindow);
+    cv::Point findEyeCenter(cv::Mat face, cv::Rect eye);
 };
 
 #endif // FINDEYECENTER_H

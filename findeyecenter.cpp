@@ -107,7 +107,7 @@ void testPossibleCentersFormula(int x, int y, const Mat &weight, double gx, doub
     }
 }
 
-Point findEyeCenter(Mat face, Rect eye, string debugWindow)
+Point findEyeCenter(Mat face, Rect eye)
 {
     Mat eyeROIUnscaled = face(eye);
     Mat eyeROI;

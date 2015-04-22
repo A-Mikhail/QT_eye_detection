@@ -23,6 +23,7 @@
 #include <iostream>
 #include <queue>
 #include <stdio.h>
+#include <math.h>
 
 // OpenCV includes
 #include <opencv2/core/core.hpp>
