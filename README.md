@@ -25,4 +25,4 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
     
- Full Text License - [LICENSE](#LICENSE)
+ Full Text License - [LICENSE](https://github.com/A-Mikhail/eyeDetection/blob/master/LICENSE)
