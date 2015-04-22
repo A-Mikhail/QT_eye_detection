@@ -48,13 +48,16 @@ SOURCES  += main.cpp\
             mainwindow.cpp \
             aboutwindow.cpp \
     findeyecorner.cpp \
-    findeyecenter.cpp
+    findeyecenter.cpp \
+    helpers.cpp
 
 HEADERS  += mainwindow.h \
             aboutwindow.h \
             stdafx.h \
     findeyecorner.h \
-    findeyecenter.h
+    findeyecenter.h \
+    constants.h \
+    helpers.h
 
 FORMS    += mainwindow.ui \
             aboutwindow.ui

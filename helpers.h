@@ -17,15 +17,21 @@
     along with Alizee.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FINDEYECENTER_H
-#define FINDEYECENTER_H
+#ifndef HELPERS_H
+#define HELPERS_H
 
-#include "opencv2/imgproc/imgproc.hpp"
 
-class findEyeCenter
+bool rectInImage(cv::Rect rect, cv::Mat image);
+bool inMat(cv::Point p, int rows, int cols);
+
+cv::Mat matrixMagnitude(const cv::Mat &matX, const cv::Mat &matY);
+double computeDynamicThreshold(const cv::Mat &mat, double stdDevFactor);
+
+class helpers
 {
-public slots:
-    cv::Point findEyeCenter(cv::Mat face, cv::Rect eye, std::string debugWindow);
+public:
+    helpers();
+    ~helpers();
 };
 
-#endif // FINDEYECENTER_H
+#endif // HELPERS_H
