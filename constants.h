@@ -25,8 +25,5 @@ const double gradientThreshold  = 50.0;
 const bool enablePostProcess        = true;
 const float postProcessThreshold    = 0.97;
 
-// Eye Corner
-const bool enableEyeCorner = false;
-
 #endif // CONSTANTS_H
 

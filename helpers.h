@@ -27,6 +27,7 @@ class helpers
 public:
 
 public slots:
+
     bool rectInImage(cv::Rect rect, cv::Mat image);
 
     bool inMat(cv::Point p, int rows, int cols);

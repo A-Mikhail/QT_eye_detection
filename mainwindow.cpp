@@ -23,7 +23,8 @@
 
 #include "constants.h"
 #include "findeyecenter.h"
-#include "findeyecorner.h"
+
+#include "stdafx.h"
 
 using namespace std;
 using namespace cv;
@@ -32,7 +33,7 @@ void detectAndDisplay(Mat frame);
 
 // Подключение haarcascade 
 String face_cascade_name = "C:\\Users\\micha_000\\Desktop\\Pr.Alizee\\AlizeeQt\\haarcascade_face_alt2.xml";
-String eye_cascade_name = "C:\\Users\\micha_000\\Desktop\\Pr.Alizee\\AlizeeQt\\haarcascade_eyes.xml";
+String eye_cascade_name = "C:\\Users\\micha_000\\Desktop\\Pr.Alizee\\AlizeeQt\\haarcascade_mcs_eyepair_small.xml";
 
 CascadeClassifier face_cascade;
 CascadeClassifier eye_cascade;
@@ -41,7 +42,6 @@ RNG rng(12345);
 Mat debugImage;
 Mat skinCrCbHist = Mat::zeros(Size(256, 256), CV_8UC1);
 
-findEyeCorner fecorner;
 findEyeCenter fecenter;
 
 /*
@@ -53,30 +53,30 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 {
     ui->setupUi(this);
 
-    // Открытие первой веб-камеры
-    capWebcam.open(0);
-
     // Сообщения о отсутствии face_cascade или eye_cascade
     if( !face_cascade.load( face_cascade_name ) ) {QMessageBox::critical(this, "Ошибка!", "Ошибка загрузки face_cascade", QMessageBox::Ok); return; };
     if( !eye_cascade.load( eye_cascade_name ) ){QMessageBox::critical(this, "Ошибка!", "Ошибка загрузки eye_cascade", QMessageBox::Ok); return; };
 
+    ellipse(skinCrCbHist, Point(113, 155.6), Size(23.4, 15.2),
+            43.0, 0.0, 360.0, Scalar(255, 255, 255), -1);
+
+    // Открытие первой веб-камеры
+    capWebCam.open(0);
+
     // Сообщение об отсутствии веб-камеры
-    if (!capWebcam.isOpened())
+    if (!capWebCam.isOpened())
     {
         QMessageBox::warning(this, "Ошибка!", "Камера не найдена");
 
         return; // выход
     }
 
-    fecorner.createCornerKernels();
-
-    ellipse(skinCrCbHist, Point(113, 155.6), Size(23.4, 15.2),
-            43.0, 0.0, 360.0, Scalar(255, 255, 255), -1);
-
     // Инициализация таймера с обновлением в 60мс.
     tmrTimer = new QTimer(this);
     connect(tmrTimer, SIGNAL(timeout()), this, SLOT(processFrameAndUpdateGUI()));
-    tmrTimer->start(60);
+    tmrTimer->start(120);
+
+    return;
 }
 
 
@@ -86,38 +86,33 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 */
 void MainWindow::processFrameAndUpdateGUI()
 {
-    capWebcam.read(frame);
-
-    if(frame.empty() == true) return;
+    capWebCam.read(frame);
 
     QImage qimgOriginal((uchar*)frame.data, frame.cols, frame.rows,
                         frame.step, QImage::Format_RGB888);
+    // зеркальное отображение
+    flip(frame, frame, 1);
 
     cvtColor(frame, frame, CV_BGR2RGB);
 
-    displayAndUpdateRectangle();
+    if (!frame.empty())
+    {
+
+        detectAndDisplay(frame);
+
+    } else {
+
+        QMessageBox::warning(this, "Ошибка!", "Камера не найдена");
+
+        this -> close();
+
+    }
 
     ui -> lblWebCam -> setPixmap(QPixmap::fromImage(qimgOriginal));
 }
 
-void MainWindow::displayAndUpdateRectangle()
-{
-    if(frame.empty() == true)
-    {
-        QMessageBox::warning(this, "Ошибка!", "Нед доступа к frame");
-        return;
-    }
 
-    flip(frame, frame, 1);
-
-    Mat gray;
-
-    cvtColor(frame, gray, CV_BGR2RGB);
-
-    fecorner.releaseCornerKernels();
-}
-
-void findEyes(Mat frame_gray, Rect face)
+void MainWindow::findEyes(Mat frame_gray, Rect face)
 {
     Mat faceROI = frame_gray(face);
     Mat debugFace = faceROI;
@@ -129,86 +124,33 @@ void findEyes(Mat frame_gray, Rect face)
     }
 
     // -- Поиск региона глаз и отрисовка
-    int eye_region_width = face.width * (eyePercentHeight / 100.0);
-    int eye_region_height = face.height * (eyePercentHeight / 100.0);
-    int eye_region_top = face.height * (eyePercentTop / 100.0);
+    int eye_region_width    = face.width  * (eyePercentHeight / 100.0);
+    int eye_region_height   = face.height * (eyePercentHeight / 100.0);
+    int eye_region_top      = face.height * (eyePercentTop / 100.0);
 
     Rect leftEyeRegion(face.width * (eyePercentSide / 100.0),
-                       eye_region_top, eye_region_width, eye_region_height);
+                        eye_region_top, eye_region_width, eye_region_height);
 
     Rect rightEyeRegion(face.width - eye_region_width - face.width * (eyePercentSide / 100.0),
                         eye_region_top, eye_region_width, eye_region_height);
 
     // -- Поиск центра глаза
-    Point leftPupil = fecenter.eyeCenter(faceROI, leftEyeRegion, "Left Eye");
-    Point rightPupil = fecenter.eyeCenter(faceROI, rightEyeRegion, "Right Eye");
-
-    // -- Получаем регионы углов
-    Rect leftRightCornerRegion(leftEyeRegion);
-    leftRightCornerRegion.width -= leftPupil.x;
-    leftRightCornerRegion.x += leftPupil.x;
-    leftRightCornerRegion.height /= 2;
-    leftRightCornerRegion.y += leftRightCornerRegion.height / 2;
-
-    Rect leftLeftCornerRegion(leftEyeRegion);
-    leftLeftCornerRegion.width = leftPupil.x;
-    leftLeftCornerRegion.height /= 2;
-    leftLeftCornerRegion.y += leftLeftCornerRegion.height / 2;
-
-    Rect rightLeftCornerRegion(rightEyeRegion);
-    rightLeftCornerRegion.width = rightPupil.x;
-    rightLeftCornerRegion.height /= 2;
-    rightLeftCornerRegion.y += rightLeftCornerRegion.height / 2;
-
-    Rect rightRightCornerRegion(rightEyeRegion);
-    rightRightCornerRegion.width -= rightPupil.x;
-    rightRightCornerRegion.x += rightPupil.x;
-    rightRightCornerRegion.height /= 2;
-    rightRightCornerRegion.y += rightRightCornerRegion.height / 2;
-
-    rectangle(debugFace,leftRightCornerRegion,200);
-    rectangle(debugFace,leftLeftCornerRegion,200);
-    rectangle(debugFace,rightLeftCornerRegion,200);
-    rectangle(debugFace,rightRightCornerRegion,200);
+    Point leftPupil = fecenter.eyeCenter(faceROI, leftEyeRegion);
+    Point rightPupil = fecenter.eyeCenter(faceROI, rightEyeRegion);
 
     // -- Смена координат центра глаз относительно лица
     rightPupil.x += rightEyeRegion.x;
     rightPupil.y += rightEyeRegion.y;
+
     leftPupil.x += leftEyeRegion.x;
     leftPupil.y += leftEyeRegion.y;
 
     // Отрисовка центра глаз
-    circle(debugFace, rightPupil, 3, 1234);
-    circle(debugFace, leftPupil, 3, 1234);
-
-    // Поиск угла глаз
-    if (enableEyeCorner)
-    {
-        Point2f leftRightCorner = fecorner.eyeCorner(faceROI(leftRightCornerRegion), true, false);
-        leftRightCorner.x += leftRightCornerRegion.x;
-        leftRightCorner.y += leftRightCornerRegion.y;
-
-        Point2f leftLeftCorner = fecorner.eyeCorner(faceROI(leftLeftCornerRegion), true, true);
-        leftLeftCorner.x += leftLeftCornerRegion.x;
-        leftLeftCorner.y += leftLeftCornerRegion.y;
-
-        Point2f rightLeftCorner = fecorner.eyeCorner(faceROI(rightLeftCornerRegion), false, true);
-        rightLeftCorner.x += rightLeftCornerRegion.x;
-        rightLeftCorner.y += rightLeftCornerRegion.y;
-
-        Point2f rightRightCorner = fecorner.eyeCorner(faceROI(rightRightCornerRegion), false, false);
-        rightRightCorner.x += rightRightCornerRegion.x;
-        rightRightCorner.y += rightRightCornerRegion.y;
-
-        circle(faceROI, leftRightCorner, 3, 200);
-        circle(faceROI, leftLeftCorner, 3, 200);
-        circle(faceROI, rightLeftCorner, 3, 200);
-        circle(faceROI, rightRightCorner, 3, 200);
-    }
-
+    circle(debugFace, rightPupil, 1, 1234);
+    circle(debugFace, leftPupil, 1, 1234);
 }
 
-Mat findSkin (Mat &frame)
+Mat MainWindow::findSkin (Mat &frame)
 {
     Mat input;
     Mat output = Mat(frame.rows, frame.cols, CV_8U);
@@ -234,27 +176,24 @@ Mat findSkin (Mat &frame)
     return output;
 }
 
-/*
- *  @function detectAndDisplay
- */
-void detectAndDisplay(Mat frame)
+void MainWindow::detectAndDisplay(Mat frame)
 {
     vector<Rect> faces;
 
     vector<Mat> rgbChannels(3);
+
     split(frame, rgbChannels);
-    Mat frame_gray = rgbChannels[2];
 
-    face_cascade.detectMultiScale(frame_gray, faces, 1.1, 2, 0|CV_HAAR_SCALE_IMAGE|CV_HAAR_FIND_BIGGEST_OBJECT, Size(150, 150));
+    face_cascade.detectMultiScale(frame, faces, 1.1, 2, 0|CV_HAAR_SCALE_IMAGE|CV_HAAR_FIND_BIGGEST_OBJECT, Size(150, 150));
 
-    for (int i = 0; i < faces.size(); i++)
+    /*for (int i = 0; i < faces.size(); i++)
     {
-        rectangle(debugImage, faces[i], 1234);
-    }
+        rectangle(frame_gray, faces[i], 1234);
+    }*/
 
     if (faces.size() > 0)
     {
-        findEyes(frame_gray, faces[0]);
+        findEyes(frame, faces[0]);
     }
 }
 

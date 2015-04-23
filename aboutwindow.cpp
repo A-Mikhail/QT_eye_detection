@@ -25,7 +25,9 @@ aboutwindow::aboutwindow(QWidget *parent) :
     ui(new Ui::aboutwindow)
 {
     ui->setupUi(this);
+
     this->setStyleSheet("background-color: #333333;");
+
 }
 
 aboutwindow::~aboutwindow()

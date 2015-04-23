@@ -47,7 +47,6 @@ PRECOMPILED_HEADER = stdafx.h
 SOURCES  += main.cpp\
             mainwindow.cpp \
             aboutwindow.cpp \
-    findeyecorner.cpp \
     findeyecenter.cpp \
     helpers.cpp
 
@@ -56,8 +55,7 @@ HEADERS  += mainwindow.h \
             stdafx.h \
     findeyecenter.h \
     constants.h \
-    helpers.h \
-    findeyecorner.h
+    helpers.h
 
 FORMS    += mainwindow.ui \
             aboutwindow.ui

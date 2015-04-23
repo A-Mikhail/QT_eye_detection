@@ -8,6 +8,7 @@
 # Documentation
 * OpenCV - http://docs.opencv.org/index.html
 * Qt - http://doc.qt.io/
+* EyeHaarcascade - http://www-personal.umich.edu/~shameem/haarcascade_eye.html
 
 # License
  “Copyright 2015 Mikhail Adamenko”

@@ -32,7 +32,7 @@ helpers h;
 
 Point findEyeCenter::unscalePoint(Point p, Rect origSize)
 {
-    float ratio = (((float)fastEyeWidth)/origSize.width);
+    float ratio = (((float)fastEyeWidth) / origSize.width);
 
     int x = round(p.x / ratio);
     int y = round(p.y / ratio);
@@ -67,6 +67,7 @@ Mat findEyeCenter::computeMatXGradient(const Mat &mat)
 
     return out;
 }
+
 
 void findEyeCenter::testPossibleCentersFormula(int x, int y, const Mat &weight, double gx, double gy, Mat &out)
 {
@@ -105,7 +106,7 @@ void findEyeCenter::testPossibleCentersFormula(int x, int y, const Mat &weight, 
     }
 }
 
-Point findEyeCenter::eyeCenter(Mat face, Rect eye, string debugWindow)
+Point findEyeCenter::eyeCenter(Mat face, Rect eye)
 {
     Mat eyeROIUnscaled = face(eye);
     Mat eyeROI;
@@ -202,11 +203,6 @@ Point findEyeCenter::eyeCenter(Mat face, Rect eye, string debugWindow)
         double floodThresh = maxVal * postProcessThreshold;
 
         threshold(out, floodClone, floodThresh, 0.0f, THRESH_TOZERO);
-
-        if(plotVectorField)
-        {
-            imwrite("eyeFrame.png", eyeROIUnscaled);
-        }
 
         Mat mask = floodKillEdges(floodClone);
 

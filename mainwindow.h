@@ -45,17 +45,18 @@ public slots:
 
     void processFrameAndUpdateGUI();
 
-    void displayAndUpdateRectangle();
+    void findEyes(cv::Mat frame_gray, cv::Rect face);
+
+    cv::Mat findSkin (cv::Mat &frame);
+
+    void detectAndDisplay(cv::Mat frame);
 
 private:
     Ui::MainWindow *ui;
 
     cv::Mat frame;
 
-    cv::VideoCapture capWebcam;
-
-    cv::Mat eye_tpl;
-    cv::Rect eye_bb;
+    cv::VideoCapture capWebCam;
 
     QImage qimgOriginal;
 

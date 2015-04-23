@@ -33,9 +33,10 @@ public slots:
 
     void testPossibleCentersFormula(int x, int y, const cv::Mat &weight, double gx, double gy, cv::Mat &out);
 
-    cv::Point eyeCenter(cv::Mat face, cv::Rect eye, std::string debugWindow);
+    cv::Point eyeCenter(cv::Mat face, cv::Rect eye);
 
     bool floodShouldPushPoint(const cv::Point &np, const cv::Mat &mat);
+
     cv::Mat floodKillEdges(cv::Mat &mat);
 };
 
