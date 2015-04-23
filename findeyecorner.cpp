@@ -49,8 +49,8 @@ void findEyeCorner::createCornerKernels()
 
 void findEyeCorner::releaseCornerKernels()
 {
-    delete leftCornerKernels;
-    delete rightCornerKernels;
+    delete leftCornerKernel;
+    delete rightCornerKernel;
 }
 
 
@@ -70,20 +70,20 @@ Mat eyeCornerMap(const Mat &region, bool left, bool left2)
     return cornerMap;
 }
 
-Point2f findEyeCorner(Mat region, bool left, bool left2)
+Point2f findEyeCorner::eyeCorner(Mat region, bool left, bool left2)
 {
     Mat cornerMap = eyeCornerMap(region, left, left2);
 
     Point maxP;
     minMaxLoc(cornerMap, NULL, NULL, NULL, &maxP);
 
-    Pont2f maxP2;
-    maxP2 = findSubPixelEyeCorner(cornerMap, maxP);
+    Point2f maxP2;
+    maxP2 = findSubPixelEyeCorner(cornerMap);
 
     return maxP2;
 }
 
-Point2f findSubPixelEyeCorner(Mat region, Point maxP)
+Point2f findEyeCorner::findSubPixelEyeCorner(Mat region)
 {
     Size sizeRegion = region.size();
 

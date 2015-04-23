@@ -54,10 +54,10 @@ SOURCES  += main.cpp\
 HEADERS  += mainwindow.h \
             aboutwindow.h \
             stdafx.h \
-    findeyecorner.h \
     findeyecenter.h \
     constants.h \
-    helpers.h
+    helpers.h \
+    findeyecorner.h
 
 FORMS    += mainwindow.ui \
             aboutwindow.ui

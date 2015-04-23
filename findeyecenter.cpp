@@ -28,9 +28,9 @@ using namespace cv;
 
 Mat floodKillEdges(Mat &mat);
 
-#pragma mark Helpers
+helpers h;
 
-Point unscalePoint(Point p, Rect origSize)
+Point findEyeCenter::unscalePoint(Point p, Rect origSize)
 {
     float ratio = (((float)fastEyeWidth)/origSize.width);
 
@@ -40,18 +40,18 @@ Point unscalePoint(Point p, Rect origSize)
     return Point(x,y);
 }
 
-void scaleToFastSize(const Mat &src, Mat &dst)
+void findEyeCenter::scaleToFastSize(const Mat &src, Mat &dst)
 {
     resize(src, dst, Size(fastEyeWidth,(((float)fastEyeWidth) / src.cols ) * src.rows));
 }
 
-Mat computeMatXGradient(const Mat *mat)
+Mat findEyeCenter::computeMatXGradient(const Mat &mat)
 {
     Mat out(mat.rows, mat.cols, CV_64F);
 
     for (int y = 0; y < mat.rows; ++y)
     {
-        const uchar *Mr = mar.ptr<uchar>(y);
+        const uchar *Mr = mat.ptr<uchar>(y);
         double *Or = out.ptr<double>(y);
 
         Or[0] = Mr[1] - Mr[0];
@@ -68,9 +68,7 @@ Mat computeMatXGradient(const Mat *mat)
     return out;
 }
 
-#pragma mark Main Algorithm
-
-void testPossibleCentersFormula(int x, int y, const Mat &weight, double gx, double gy, Mat &out)
+void findEyeCenter::testPossibleCentersFormula(int x, int y, const Mat &weight, double gx, double gy, Mat &out)
 {
     for (int cy = 0; cy < out.rows; ++cy)
     {
@@ -99,7 +97,7 @@ void testPossibleCentersFormula(int x, int y, const Mat &weight, double gx, doub
 
             if(enableWeight)
             {
-                Or[cx] += dotProduct * dotProduct * (Wr[cx] / WeightDivisor);
+                Or[cx] += dotProduct * dotProduct * (Wr[cx] / weightDivisor);
             } else {
                 Or[cx] += dotProduct * dotProduct;
             }
@@ -107,7 +105,7 @@ void testPossibleCentersFormula(int x, int y, const Mat &weight, double gx, doub
     }
 }
 
-Point findEyeCenter(Mat face, Rect eye)
+Point findEyeCenter::eyeCenter(Mat face, Rect eye, string debugWindow)
 {
     Mat eyeROIUnscaled = face(eye);
     Mat eyeROI;
@@ -123,10 +121,10 @@ Point findEyeCenter(Mat face, Rect eye)
 
     // Normilize and threshold the gradient
     // compute all the magnitudes
-    Mat mags = matrixMagnitude(gradientX, gradientY);
+    Mat mags = h.matrixMagnitude(gradientX, gradientY);
 
     // compute the threshold
-    double gradientThresh = computeDynamicThreshold(mags, gradientThreshold);
+    double gradientThresh = h.computeDynamicThreshold(mags, gradientThreshold);
 
     for (int y = 0; y < eyeROI.rows; ++y)
     {
@@ -201,7 +199,7 @@ Point findEyeCenter(Mat face, Rect eye)
     {
         Mat floodClone;
 
-        double floodThresh = maxVal * PostProcessThreshold;
+        double floodThresh = maxVal * postProcessThreshold;
 
         threshold(out, floodClone, floodThresh, 0.0f, THRESH_TOZERO);
 
@@ -219,15 +217,13 @@ Point findEyeCenter(Mat face, Rect eye)
 
 }
 
-#pragma mark Postprocessing
-
-bool floodShouldPushPoint(const Point &np, const Mat &mat)
+bool findEyeCenter::floodShouldPushPoint(const Point &np, const Mat &mat)
 {
-    return inMat(np, mat.rows, mat.cols);
+    return h.inMat(np, mat.rows, mat.cols);
 }
 
 // returns a mask
-Mat floodKillEdges(Mat &mat)
+Mat findEyeCenter::floodKillEdges(Mat &mat)
 {
     rectangle(mat, Rect(0, 0, mat.cols, mat.rows), 255);
 
@@ -245,20 +241,20 @@ Mat floodKillEdges(Mat &mat)
 
         if(mat.at<float>(p) == 0.0f)
         {
-            contiune;
+            continue;
         }
 
         Point np(p.x + 1, p.y); // right
-        if (floodShouldPushPoint(np, mat)) toDo.pish(np);
+        if (floodShouldPushPoint(np, mat)) toDo.push(np);
 
         np.x = p.x - 1; np.y = p.y; // left;
-        if (floodShouldPushPoint(np, mat)) toDo.pish(np);
+        if (floodShouldPushPoint(np, mat)) toDo.push(np);
 
         np.x = p.x; np.y = p.y + 1; // down;
-        if (floodShouldPushPoint(np, mat)) toDo.pish(np);
+        if (floodShouldPushPoint(np, mat)) toDo.push(np);
 
         np.x = p.x; np.y = p.y - 1; // up
-        if (floodShouldPushPoint(np, mat)) toDo.pish(np);
+        if (floodShouldPushPoint(np, mat)) toDo.push(np);
 
         // kill
         mat.at<float>(p) = 0.0f;

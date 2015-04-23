@@ -50,7 +50,7 @@ public slots:
 private:
     Ui::MainWindow *ui;
 
-    cv::Mat matOriginal;
+    cv::Mat frame;
 
     cv::VideoCapture capWebcam;
 

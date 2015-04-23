@@ -16,7 +16,7 @@ const float smoothFaceFactor    =   0.005;
 
 // Algorithm Parameters
 const int fastEyeWidth          = 50;
-const int weigthBlurSise        = 5;
+const int weightBlurSize        = 5;
 const bool enableWeight         = true;
 const float weightDivisor       = 1.0;
 const double gradientThreshold  = 50.0;

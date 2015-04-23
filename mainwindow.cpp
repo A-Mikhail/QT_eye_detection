@@ -28,6 +28,8 @@
 using namespace std;
 using namespace cv;
 
+void detectAndDisplay(Mat frame);
+
 // Подключение haarcascade 
 String face_cascade_name = "C:\\Users\\micha_000\\Desktop\\Pr.Alizee\\AlizeeQt\\haarcascade_face_alt2.xml";
 String eye_cascade_name = "C:\\Users\\micha_000\\Desktop\\Pr.Alizee\\AlizeeQt\\haarcascade_eyes.xml";
@@ -35,12 +37,12 @@ String eye_cascade_name = "C:\\Users\\micha_000\\Desktop\\Pr.Alizee\\AlizeeQt\\h
 CascadeClassifier face_cascade;
 CascadeClassifier eye_cascade;
 
-void detectAndDisplay(Mat frame);
-
 RNG rng(12345);
 Mat debugImage;
 Mat skinCrCbHist = Mat::zeros(Size(256, 256), CV_8UC1);
 
+findEyeCorner fecorner;
+findEyeCenter fecenter;
 
 /*
 * MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
@@ -66,7 +68,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
         return; // выход
     }
 
-    createCornerKernels();
+    fecorner.createCornerKernels();
 
     ellipse(skinCrCbHist, Point(113, 155.6), Size(23.4, 15.2),
             43.0, 0.0, 360.0, Scalar(255, 255, 255), -1);
@@ -84,14 +86,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 */
 void MainWindow::processFrameAndUpdateGUI()
 {
-    capWebcam.read(matOriginal);
+    capWebcam.read(frame);
 
-    if(matOriginal.empty() == true) return;
+    if(frame.empty() == true) return;
 
-    QImage qimgOriginal((uchar*)matOriginal.data, matOriginal.cols, matOriginal.rows,
-                        matOriginal.step, QImage::Format_RGB888);
+    QImage qimgOriginal((uchar*)frame.data, frame.cols, frame.rows,
+                        frame.step, QImage::Format_RGB888);
 
-    cvtColor(matOriginal, matOriginal, CV_BGR2RGB);
+    cvtColor(frame, frame, CV_BGR2RGB);
 
     displayAndUpdateRectangle();
 
@@ -100,24 +102,25 @@ void MainWindow::processFrameAndUpdateGUI()
 
 void MainWindow::displayAndUpdateRectangle()
 {
-    if(matOriginal.empty() == true)
+    if(frame.empty() == true)
     {
         QMessageBox::warning(this, "Ошибка!", "Нед доступа к frame");
         return;
     }
 
-    flip(matOriginal, matOriginal, 1);
+    flip(frame, frame, 1);
 
     Mat gray;
 
-    cvtColor(matOriginal, gray, CV_BGR2RGB);
+    cvtColor(frame, gray, CV_BGR2RGB);
 
-    releaseCornerKernels();
+    fecorner.releaseCornerKernels();
 }
 
 void findEyes(Mat frame_gray, Rect face)
 {
-    Mat faceROI = framge_gray(face);
+    Mat faceROI = frame_gray(face);
+    Mat debugFace = faceROI;
 
     if (smoothFaceImage)
     {
@@ -137,8 +140,8 @@ void findEyes(Mat frame_gray, Rect face)
                         eye_region_top, eye_region_width, eye_region_height);
 
     // -- Поиск центра глаза
-    Point leftPupil = findEyeCenter(faceROI, leftEyeRegion, "Left Eye");
-    Point rightPupil = findEyeCenter(faceROI, rightEyeRegion, "Right Eye");
+    Point leftPupil = fecenter.eyeCenter(faceROI, leftEyeRegion, "Left Eye");
+    Point rightPupil = fecenter.eyeCenter(faceROI, rightEyeRegion, "Right Eye");
 
     // -- Получаем регионы углов
     Rect leftRightCornerRegion(leftEyeRegion);
@@ -181,19 +184,19 @@ void findEyes(Mat frame_gray, Rect face)
     // Поиск угла глаз
     if (enableEyeCorner)
     {
-        Point2f leftRightCorner = fingEyeCorner(faceROI(leftRightCornerRegion), true, false);
+        Point2f leftRightCorner = fecorner.eyeCorner(faceROI(leftRightCornerRegion), true, false);
         leftRightCorner.x += leftRightCornerRegion.x;
         leftRightCorner.y += leftRightCornerRegion.y;
 
-        Point2f leftLeftCorner = findEyeCorner(faceROI(leftLeftCornerRegion), true, true);
+        Point2f leftLeftCorner = fecorner.eyeCorner(faceROI(leftLeftCornerRegion), true, true);
         leftLeftCorner.x += leftLeftCornerRegion.x;
         leftLeftCorner.y += leftLeftCornerRegion.y;
 
-        Point2f rightLeftCorner = findEyeCorner(faceROI(rightLeftCornerRegion), false, true);
+        Point2f rightLeftCorner = fecorner.eyeCorner(faceROI(rightLeftCornerRegion), false, true);
         rightLeftCorner.x += rightLeftCornerRegion.x;
         rightLeftCorner.y += rightLeftCornerRegion.y;
 
-        Point2f rightRightCorner = findEyeCorner(faceROI(rightRightCornerRegion), false, false);
+        Point2f rightRightCorner = fecorner.eyeCorner(faceROI(rightRightCornerRegion), false, false);
         rightRightCorner.x += rightRightCornerRegion.x;
         rightRightCorner.y += rightRightCornerRegion.y;
 
@@ -205,14 +208,14 @@ void findEyes(Mat frame_gray, Rect face)
 
 }
 
-Mat findSkin (mat &frame)
+Mat findSkin (Mat &frame)
 {
     Mat input;
     Mat output = Mat(frame.rows, frame.cols, CV_8U);
 
     cvtColor(frame, input, CV_BGR2YCrCb);
 
-    for (int y = 0; y < input.rows, ++y)
+    for (int y = 0; y < input.rows; ++y)
     {
         const Vec3b *Mr = input.ptr<Vec3b>(y);
         Vec3b *Or = frame.ptr<Vec3b>(y);

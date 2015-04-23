@@ -25,18 +25,18 @@
 using namespace std;
 using namespace cv;
 
-bool rectInImage(Rect rect, Mat image)
+bool helpers::rectInImage(Rect rect, Mat image)
 {
     return rect.x > 0 && rect.y > 0 && rect.x + rect.width < image.cols &&
             rect.y + rect.height < image.rows;
 }
 
-bool inMat(Point p, int rows, int cols)
+bool helpers::inMat(Point p, int rows, int cols)
 {
     return p.x >= 0 && p.x < cols && p.y >= 0 && p.y < rows;
 }
 
-Mat matrixMagnitude(const Mat &matX, const Mat &matY)
+Mat helpers::matrixMagnitude(const Mat &matX, const Mat &matY)
 {
     Mat mags(matX.rows, matX.cols, CV_64F);
 
@@ -59,7 +59,7 @@ Mat matrixMagnitude(const Mat &matX, const Mat &matY)
 
 }
 
-double computeDynamicThreshold(const Mat &mat, double stdDevFactor)
+double helpers::computeDynamicThreshold(const Mat &mat, double stdDevFactor)
 {
     Scalar stdMagnGrad, meanMagnGrad;
 
