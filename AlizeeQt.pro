@@ -68,6 +68,7 @@ HEADERS  += mainwindow.h \
     findeyecenter.h \
     constants.h \
     helpers.h \
+    videoInput/include/videoInput.h
 
 FORMS    += mainwindow.ui \
             aboutwindow.ui
@@ -76,3 +77,15 @@ RESOURCES += \
     resources.qrc \
 
 RC_FILE = alizee.rc
+
+DISTFILES += \
+    videoInput/ddraw.lib \
+    videoInput/dxguid.lib \
+    videoInput/glfw.lib \
+    videoInput/libvideoInput.a \
+    videoInput/ole32.lib \
+    videoInput/oleaut32.lib \
+    videoInput/strmbasd.lib \
+    videoInput/strmbase.lib \
+    videoInput/strmiids.lib \
+    videoInput/uuid.lib
