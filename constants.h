@@ -1,9 +1,6 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
-// Debugging
-const bool plotVectorField = false;
-
 // Size constants
 const int eyePercentTop     =   25;
 const int eyePercentSide    =   13;

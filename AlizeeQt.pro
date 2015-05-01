@@ -32,6 +32,7 @@ TARGET = AlizeeQt
 TEMPLATE = app
 
 INCLUDEPATH += D:\OpenCV_withQt\debug\install\include
+INCLUDEPATH += C:\Users\micha_000\Desktop\Pr.Alizee\AlizeeQt\videoInput\include
 
 LIBS += D:\OpenCV_withQt\debug\bin\libopencv_core2410d.dll
 LIBS += D:\OpenCV_withQt\debug\bin\libopencv_contrib2410d.dll
@@ -39,6 +40,17 @@ LIBS += D:\OpenCV_withQt\debug\bin\libopencv_highgui2410d.dll
 LIBS += D:\OpenCV_withQt\debug\bin\libopencv_imgproc2410d.dll
 LIBS += D:\OpenCV_withQt\debug\bin\libopencv_calib3d2410d.dll
 LIBS += D:\OpenCV_withQt\debug\bin\libopencv_objdetect2410d.dll
+
+LIBS += C:\Users\micha_000\Desktop\Pr.Alizee\AlizeeQt\videoInput\libvideoInput.a
+LIBS += C:\Users\micha_000\Desktop\Pr.Alizee\AlizeeQt\videoInput\ddraw.lib
+LIBS += C:\Users\micha_000\Desktop\Pr.Alizee\AlizeeQt\videoInput\dxguid.lib
+LIBS += C:\Users\micha_000\Desktop\Pr.Alizee\AlizeeQt\videoInput\glfw.lib
+LIBS += C:\Users\micha_000\Desktop\Pr.Alizee\AlizeeQt\videoInput\ole32.lib
+LIBS += C:\Users\micha_000\Desktop\Pr.Alizee\AlizeeQt\videoInput\oleaut32.lib
+LIBS += C:\Users\micha_000\Desktop\Pr.Alizee\AlizeeQt\videoInput\strmbasd.lib
+LIBS += C:\Users\micha_000\Desktop\Pr.Alizee\AlizeeQt\videoInput\strmbase.lib
+LIBS += C:\Users\micha_000\Desktop\Pr.Alizee\AlizeeQt\videoInput\strmiids.lib
+LIBS += C:\Users\micha_000\Desktop\Pr.Alizee\AlizeeQt\videoInput\uuid.lib
 
 CONFIG += precompile_header
 
@@ -48,14 +60,14 @@ SOURCES  += main.cpp\
             mainwindow.cpp \
             aboutwindow.cpp \
     findeyecenter.cpp \
-    helpers.cpp
+    helpers.cpp \
 
 HEADERS  += mainwindow.h \
             aboutwindow.h \
             stdafx.h \
     findeyecenter.h \
     constants.h \
-    helpers.h
+    helpers.h \
 
 FORMS    += mainwindow.ui \
             aboutwindow.ui
@@ -64,4 +76,3 @@ RESOURCES += \
     resources.qrc \
 
 RC_FILE = alizee.rc
-

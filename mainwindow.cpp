@@ -24,6 +24,7 @@
 #include "constants.h"
 #include "findeyecenter.h"
 
+#include "videoInput.h"
 #include "stdafx.h"
 
 using namespace std;
@@ -32,8 +33,9 @@ using namespace cv;
 void detectAndDisplay(Mat frame);
 
 // Подключение haarcascade 
-String face_cascade_name = "C:\\Users\\micha_000\\Desktop\\Pr.Alizee\\AlizeeQt\\haarcascade_face_alt2.xml";
-String eye_cascade_name = "C:\\Users\\micha_000\\Desktop\\Pr.Alizee\\AlizeeQt\\haarcascade_mcs_eyepair_small.xml";
+String face_cascade_name = "C:\\Users\\micha_000\\Desktop\\Pr.Alizee\\AlizeeQt\\haarcascade_frontalface_default.xml";
+String eye_cascade_name = "C:\\Users\\micha_000\\Desktop\\Pr.Alizee\\AlizeeQt\\haarcascade_eye.xml";
+
 
 CascadeClassifier face_cascade;
 CascadeClassifier eye_cascade;
@@ -54,14 +56,21 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->setupUi(this);
 
     // Сообщения о отсутствии face_cascade или eye_cascade
-    if( !face_cascade.load( face_cascade_name ) ) {QMessageBox::critical(this, "Ошибка!", "Ошибка загрузки face_cascade", QMessageBox::Ok); return; };
-    if( !eye_cascade.load( eye_cascade_name ) ){QMessageBox::critical(this, "Ошибка!", "Ошибка загрузки eye_cascade", QMessageBox::Ok); return; };
+    if( !face_cascade.load(face_cascade_name) ) {QMessageBox::critical(this, "Ошибка!", "Ошибка загрузки face_cascade", QMessageBox::Ok); return; };
+    if( !eye_cascade.load(eye_cascade_name) ){QMessageBox::critical(this, "Ошибка!", "Ошибка загрузки eye_cascade", QMessageBox::Ok); return; };
 
     ellipse(skinCrCbHist, Point(113, 155.6), Size(23.4, 15.2),
             43.0, 0.0, 360.0, Scalar(255, 255, 255), -1);
 
     // Открытие первой веб-камеры
-    capWebCam.open(0);
+
+    //capWebCam.open(0);
+
+    int numDevice = videoInput::listDevices();
+
+    char buffer [50];
+
+    sprintf (buffer, "device %d", numDevice);
 
     // Сообщение об отсутствии веб-камеры
     if (!capWebCam.isOpened())
@@ -90,6 +99,7 @@ void MainWindow::processFrameAndUpdateGUI()
 
     QImage qimgOriginal((uchar*)frame.data, frame.cols, frame.rows,
                         frame.step, QImage::Format_RGB888);
+
     // зеркальное отображение
     flip(frame, frame, 1);
 

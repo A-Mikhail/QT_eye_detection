@@ -30,9 +30,9 @@ Mat floodKillEdges(Mat &mat);
 
 helpers h;
 
-Point findEyeCenter::unscalePoint(Point p, Rect origSize)
+Point unscalePoint(Point p, Rect origSize)
 {
-    float ratio = (((float)fastEyeWidth) / origSize.width);
+    float ratio = ( ((float)fastEyeWidth) / origSize.width);
 
     int x = round(p.x / ratio);
     int y = round(p.y / ratio);
@@ -40,12 +40,12 @@ Point findEyeCenter::unscalePoint(Point p, Rect origSize)
     return Point(x,y);
 }
 
-void findEyeCenter::scaleToFastSize(const Mat &src, Mat &dst)
+void scaleToFastSize(const Mat &src, Mat &dst)
 {
-    resize(src, dst, Size(fastEyeWidth,(((float)fastEyeWidth) / src.cols ) * src.rows));
+    resize(src, dst, Size(fastEyeWidth,( ((float)fastEyeWidth) / src.cols ) * src.rows) );
 }
 
-Mat findEyeCenter::computeMatXGradient(const Mat &mat)
+Mat computeMatXGradient(const Mat &mat)
 {
     Mat out(mat.rows, mat.cols, CV_64F);
 
@@ -69,7 +69,7 @@ Mat findEyeCenter::computeMatXGradient(const Mat &mat)
 }
 
 
-void findEyeCenter::testPossibleCentersFormula(int x, int y, const Mat &weight, double gx, double gy, Mat &out)
+void testPossibleCentersFormula(int x, int y, const Mat &weight, double gx, double gy, Mat &out)
 {
     for (int cy = 0; cy < out.rows; ++cy)
     {
@@ -149,7 +149,6 @@ Point findEyeCenter::eyeCenter(Mat face, Rect eye)
         }
     }
 
-
     Mat weight;
 
     GaussianBlur(eyeROI, weight, Size(weightBlurSize, weightBlurSize), 0, 0);
@@ -213,13 +212,13 @@ Point findEyeCenter::eyeCenter(Mat face, Rect eye)
 
 }
 
-bool findEyeCenter::floodShouldPushPoint(const Point &np, const Mat &mat)
+bool floodShouldPushPoint(const Point &np, const Mat &mat)
 {
     return h.inMat(np, mat.rows, mat.cols);
 }
 
 // returns a mask
-Mat findEyeCenter::floodKillEdges(Mat &mat)
+Mat floodKillEdges(Mat &mat)
 {
     rectangle(mat, Rect(0, 0, mat.cols, mat.rows), 255);
 
