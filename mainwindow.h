@@ -21,7 +21,10 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+
 #include "stdafx.h"
+#include "selectwebcamwindow.h"
+#include "aboutwindow.h"
 
 namespace Ui {
     class MainWindow;
@@ -43,6 +46,8 @@ private slots:
 
 public slots:
 
+    void recieveWebcamIndex(QString webcamIndexText);
+
     void processFrameAndUpdateGUI();
 
     void findEyes(cv::Mat frame_gray, cv::Rect face);
@@ -53,6 +58,10 @@ public slots:
 
 private:
     Ui::MainWindow *ui;
+
+    selectWebcamWindow *selectWebcamWin = 0;
+
+    aboutwindow *aboutWin = 0;
 
     cv::Mat frame;
 

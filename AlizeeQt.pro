@@ -52,6 +52,7 @@ LIBS += C:\Users\micha_000\Desktop\Pr.Alizee\AlizeeQt\videoInput\strmbase.lib
 LIBS += C:\Users\micha_000\Desktop\Pr.Alizee\AlizeeQt\videoInput\strmiids.lib
 LIBS += C:\Users\micha_000\Desktop\Pr.Alizee\AlizeeQt\videoInput\uuid.lib
 
+QMAKE_CXXFLAGS += -std=c++11
 CONFIG += precompile_header
 
 PRECOMPILED_HEADER = stdafx.h
@@ -61,6 +62,8 @@ SOURCES  += main.cpp\
             aboutwindow.cpp \
     findeyecenter.cpp \
     helpers.cpp \
+    optionswindow.cpp \
+    selectwebcamwindow.cpp
 
 HEADERS  += mainwindow.h \
             aboutwindow.h \
@@ -68,10 +71,13 @@ HEADERS  += mainwindow.h \
     findeyecenter.h \
     constants.h \
     helpers.h \
-    videoInput/include/videoInput.h
+    optionswindow.h \
+    selectwebcamwindow.h
 
 FORMS    += mainwindow.ui \
-            aboutwindow.ui
+            aboutwindow.ui \
+    optionswindow.ui \
+    selectwebcamwindow.ui
 
 RESOURCES += \
     resources.qrc \
@@ -79,6 +85,7 @@ RESOURCES += \
 RC_FILE = alizee.rc
 
 DISTFILES += \
+    videoInput/include/videoInput.h \
     videoInput/ddraw.lib \
     videoInput/dxguid.lib \
     videoInput/glfw.lib \

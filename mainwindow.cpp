@@ -19,13 +19,13 @@
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "aboutwindow.h"
-
-#include "constants.h"
-#include "findeyecenter.h"
 
 #include "videoInput.h"
-#include "stdafx.h"
+#include "constants.h"
+
+#include "findeyecenter.h"
+
+#include <QtDebug>
 
 using namespace std;
 using namespace cv;
@@ -35,7 +35,6 @@ void detectAndDisplay(Mat frame);
 // Подключение haarcascade 
 String face_cascade_name = "C:\\Users\\micha_000\\Desktop\\Pr.Alizee\\AlizeeQt\\haarcascade_frontalface_default.xml";
 String eye_cascade_name = "C:\\Users\\micha_000\\Desktop\\Pr.Alizee\\AlizeeQt\\haarcascade_eye.xml";
-
 
 CascadeClassifier face_cascade;
 CascadeClassifier eye_cascade;
@@ -55,38 +54,51 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 {
     ui->setupUi(this);
 
-    // Сообщения о отсутствии face_cascade или eye_cascade
-    if( !face_cascade.load(face_cascade_name) ) {QMessageBox::critical(this, "Ошибка!", "Ошибка загрузки face_cascade", QMessageBox::Ok); return; };
-    if( !eye_cascade.load(eye_cascade_name) ){QMessageBox::critical(this, "Ошибка!", "Ошибка загрузки eye_cascade", QMessageBox::Ok); return; };
+    if (selectWebcamWin == 0){
+        // Открытие окна выбора веб-камеры
+        selectWebcamWin = new selectWebcamWindow();
+
+        connect(selectWebcamWin, SIGNAL(signalWebcamIndex(QString)), this,
+                SLOT(recieveWebcamIndex(QString)));
+    }
+
+    selectWebcamWin->show();
+
+ /*   // Сообщения о отсутствии face_cascade или eye_cascade
+    if( !face_cascade.load(face_cascade_name) ) {QMessageBox::critical(this,
+        "Ошибка!", "Ошибка загрузки face_cascade", QMessageBox::Ok); return; };
+
+    if( !eye_cascade.load(eye_cascade_name) ){QMessageBox::critical(this,
+        "Ошибка!", "Ошибка загрузки eye_cascade", QMessageBox::Ok); return; };
 
     ellipse(skinCrCbHist, Point(113, 155.6), Size(23.4, 15.2),
             43.0, 0.0, 360.0, Scalar(255, 255, 255), -1);
 
-    // Открытие первой веб-камеры
-
-    //capWebCam.open(0);
-
-    int numDevice = videoInput::listDevices();
-
-    char buffer [50];
-
-    sprintf (buffer, "device %d", numDevice);
-
-    // Сообщение об отсутствии веб-камеры
-    if (!capWebCam.isOpened())
-    {
-        QMessageBox::warning(this, "Ошибка!", "Камера не найдена");
-
-        return; // выход
-    }
-
-    // Инициализация таймера с обновлением в 60мс.
+    // Инициализация таймера с обновлением в 120мс.
     tmrTimer = new QTimer(this);
     connect(tmrTimer, SIGNAL(timeout()), this, SLOT(processFrameAndUpdateGUI()));
     tmrTimer->start(120);
 
-    return;
+    return;*/
 }
+
+void MainWindow::recieveWebcamIndex(QString webcamIndexText)
+{
+    qDebug() << webcamIndexText;
+}
+
+        // Открытие первой веб-камеры
+        //capWebCam.open(cwd.);
+
+     // Сообщение об отсутствии веб-камеры
+    /* if (!capWebCam.isOpened())
+     {
+        QMessageBox::warning(this, "Ошибка!", "Камера не найдена");
+
+        return; // выход
+     }
+*/
+
 
 
 /*
@@ -213,9 +225,9 @@ void MainWindow::detectAndDisplay(Mat frame)
 */
 void MainWindow::on_action_exit_triggered()
 {
-    this->close(); // Закрытие текущего окна
+    // Закрытие текущего окна
+    this->close();
 }
-
 
 /*
  * MainWindow::on_action_about_triggered()
@@ -223,10 +235,9 @@ void MainWindow::on_action_exit_triggered()
  */
 void MainWindow::on_action_about_triggered()
 {
-    aboutwindow *aboutWin = 0;
-
+    // Открытие окна aboutWin
     aboutWin = new aboutwindow();
-    aboutWin -> show(); // вывод окна aboutWin
+    aboutWin->show();
 }
 
 MainWindow::~MainWindow()
