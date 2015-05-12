@@ -63,7 +63,8 @@ SOURCES  += main.cpp\
     findeyecenter.cpp \
     helpers.cpp \
     optionswindow.cpp \
-    selectwebcamwindow.cpp
+    selectwebcamwindow.cpp \
+    windowsmanager.cpp
 
 HEADERS  += mainwindow.h \
             aboutwindow.h \
@@ -72,7 +73,8 @@ HEADERS  += mainwindow.h \
     constants.h \
     helpers.h \
     optionswindow.h \
-    selectwebcamwindow.h
+    selectwebcamwindow.h \
+    windowsmanager.h
 
 FORMS    += mainwindow.ui \
             aboutwindow.ui \

@@ -36,6 +36,7 @@
 // Qt includes
 #include <QtCore>
 #include <QMessageBox>
+#include <QtDebug>
 
 #endif // STDAFX
 

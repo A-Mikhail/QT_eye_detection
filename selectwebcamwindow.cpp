@@ -21,20 +21,18 @@ selectWebcamWindow::selectWebcamWindow(QWidget *parent) :
     }
 }
 
-
 selectWebcamWindow::~selectWebcamWindow()
 {
     delete ui;
 }
 
-
 void selectWebcamWindow::on_pushButton_clicked()
 {
     QString webcamIndexText = QString::number(ui->comboBox->currentIndex());
 
+    // Отправить сигнал индекса камеры
     emit signalWebcamIndex(webcamIndexText);
 
+    // закрыть окно
     this->hide();
-
-    printf("clicked");
 }

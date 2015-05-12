@@ -23,7 +23,10 @@
 #include <QMainWindow>
 
 #include "stdafx.h"
+
+// windows
 #include "selectwebcamwindow.h"
+#include "optionswindow.h"
 #include "aboutwindow.h"
 
 namespace Ui {
@@ -44,6 +47,8 @@ private slots:
 
     void on_action_about_triggered();
 
+    void on_action_settings_triggered();
+
 public slots:
 
     void recieveWebcamIndex(QString webcamIndexText);
@@ -59,9 +64,9 @@ public slots:
 private:
     Ui::MainWindow *ui;
 
-    selectWebcamWindow *selectWebcamWin = 0;
+    aboutWindow *aboutwindow = 0;
 
-    aboutwindow *aboutWin = 0;
+    optionsWindow *optionswindow = 0;
 
     cv::Mat frame;
 

@@ -23,19 +23,19 @@
 #include <QMainWindow>
 
 namespace Ui {
-class aboutwindow;
+class aboutWindow;
 }
 
-class aboutwindow : public QMainWindow
+class aboutWindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    explicit aboutwindow(QWidget *parent = 0);
-    ~aboutwindow();
+    explicit aboutWindow(QWidget *parent = 0);
+    ~aboutWindow();
 
 private:
-    Ui::aboutwindow *ui;
+    Ui::aboutWindow *ui;
 };
 
 #endif // ABOUTWINDOW_H

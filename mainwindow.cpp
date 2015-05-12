@@ -24,8 +24,7 @@
 #include "constants.h"
 
 #include "findeyecenter.h"
-
-#include <QtDebug>
+#include "windowsmanager.h"
 
 using namespace std;
 using namespace cv;
@@ -43,8 +42,6 @@ RNG rng(12345);
 Mat debugImage;
 Mat skinCrCbHist = Mat::zeros(Size(256, 256), CV_8UC1);
 
-findEyeCenter fecenter;
-
 /*
 * MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 * Главная функция файла mainwindow.cpp
@@ -54,15 +51,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 {
     ui->setupUi(this);
 
-    if (selectWebcamWin == 0){
-        // Открытие окна выбора веб-камеры
-        selectWebcamWin = new selectWebcamWindow();
-
-        connect(selectWebcamWin, SIGNAL(signalWebcamIndex(QString)), this,
-                SLOT(recieveWebcamIndex(QString)));
-    }
-
-    selectWebcamWin->show();
+    windowsManager::deviceCount();
 
  /*   // Сообщения о отсутствии face_cascade или eye_cascade
     if( !face_cascade.load(face_cascade_name) ) {QMessageBox::critical(this,
@@ -136,6 +125,8 @@ void MainWindow::processFrameAndUpdateGUI()
 
 void MainWindow::findEyes(Mat frame_gray, Rect face)
 {
+    findEyeCenter fecenter;
+
     Mat faceROI = frame_gray(face);
     Mat debugFace = faceROI;
 
@@ -220,27 +211,37 @@ void MainWindow::detectAndDisplay(Mat frame)
 }
 
 /*
-* MainWindow::on_action_exit_triggered()
-* Функция выхода по нажатию кнопки "Выход" в диалоговом меню "Меню"
-*/
-void MainWindow::on_action_exit_triggered()
-{
-    // Закрытие текущего окна
-    this->close();
-}
-
-/*
  * MainWindow::on_action_about_triggered()
  * Функция вывода окна about по нажатию кнопки "О программе" в диалоговом меню "Помощь"
  */
 void MainWindow::on_action_about_triggered()
 {
-    // Открытие окна aboutWin
-    aboutWin = new aboutwindow();
-    aboutWin->show();
+    aboutwindow = new aboutWindow();
+    aboutwindow->show();
+}
+
+/*
+* MainWindow::on_action_settings_triggered()
+* Функция вывода окна options по нажатию кнопки "Настройки" в диалоговом меню "Меню"
+*/
+void MainWindow::on_action_settings_triggered()
+{
+    optionswindow = new optionsWindow();
+    optionswindow->show();
+}
+
+/*
+* MainWindow::on_action_exit_triggered()
+* Функция выхода по нажатию кнопки "Выход" в диалоговом меню "Меню"
+*/
+void MainWindow::on_action_exit_triggered()
+{
+    this->close();
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
 }
+
+

@@ -20,9 +20,9 @@
 #include "aboutwindow.h"
 #include "ui_aboutwindow.h"
 
-aboutwindow::aboutwindow(QWidget *parent) :
+aboutWindow::aboutWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::aboutwindow)
+    ui(new Ui::aboutWindow)
 {
     ui->setupUi(this);
 
@@ -30,7 +30,7 @@ aboutwindow::aboutwindow(QWidget *parent) :
 
 }
 
-aboutwindow::~aboutwindow()
+aboutWindow::~aboutWindow()
 {
     delete ui;
 }
