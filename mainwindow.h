@@ -21,11 +21,12 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QComboBox>
+#include <QWidgetAction>
 
 #include "stdafx.h"
 
-// windows
-#include "selectwebcamwindow.h"
+// include window file
 #include "optionswindow.h"
 #include "aboutwindow.h"
 
@@ -43,30 +44,40 @@ public:
 
 private slots:
 
+    // Нажатие кнопки "Выход"
     void on_action_exit_triggered();
 
+    // Нажатие кнопки "О программе"
     void on_action_about_triggered();
 
+    // Нажатие кнопки "Настройки"
     void on_action_settings_triggered();
 
-public slots:
+public slots:   
+    // Индекс выбранной веб-камеры
+    void webcamIndex();
 
-    void recieveWebcamIndex(QString webcamIndexText);
-
+    // Обновление окна
     void processFrameAndUpdateGUI();
 
+    // Поиск глаз
     void findEyes(cv::Mat frame_gray, cv::Rect face);
-
     cv::Mat findSkin (cv::Mat &frame);
 
+    // Определение области глаз и отображение в окне
     void detectAndDisplay(cv::Mat frame);
 
 private:
     Ui::MainWindow *ui;
 
-    aboutWindow *aboutwindow = 0;
+    aboutWindow         *aboutwindow        = 0;
+    optionsWindow       *optionswindow      = 0;
 
-    optionsWindow *optionswindow = 0;
+    // Кнопки меню
+    QPushButton* helpButton;
+    QPushButton* mainButton;
+
+    QComboBox* combobox;
 
     cv::Mat frame;
 
@@ -74,7 +85,7 @@ private:
 
     QImage qimgOriginal;
 
-    QTimer* tmrTimer;
+    QTimer* tmrTimer; 
 };
 
 
