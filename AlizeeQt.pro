@@ -24,7 +24,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -53,18 +53,17 @@ LIBS += C:\Users\micha_000\Desktop\Pr.Alizee\AlizeeQt\videoInput\strmiids.lib
 LIBS += C:\Users\micha_000\Desktop\Pr.Alizee\AlizeeQt\videoInput\uuid.lib
 
 QMAKE_CXXFLAGS += -std=c++11
-CONFIG += precompile_header
+CONFIG += precompile_header \
 
 PRECOMPILED_HEADER = stdafx.h
 
-SOURCES  += main.cpp\
+SOURCES  +=\
             mainwindow.cpp \
             aboutwindow.cpp \
     findeyecenter.cpp \
     helpers.cpp \
     optionswindow.cpp \
-    selectwebcamwindow.cpp \
-    windowsmanager.cpp
+    main.cpp
 
 HEADERS  += mainwindow.h \
             aboutwindow.h \
@@ -72,14 +71,11 @@ HEADERS  += mainwindow.h \
     findeyecenter.h \
     constants.h \
     helpers.h \
-    optionswindow.h \
-    selectwebcamwindow.h \
-    windowsmanager.h
+    optionswindow.h
 
 FORMS    += mainwindow.ui \
             aboutwindow.ui \
-    optionswindow.ui \
-    selectwebcamwindow.ui
+    optionswindow.ui
 
 RESOURCES += \
     resources.qrc \
