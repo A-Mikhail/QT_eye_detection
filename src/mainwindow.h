@@ -1,7 +1,7 @@
 /*
    “Copyright 2015 Адаменко Михаил”
 
-    This file is part of Alizee.
+    This file is part of EyeDetection.
 
     Foobar is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -22,7 +22,6 @@
 
 #include <QMainWindow>
 #include <QComboBox>
-#include <QWidgetAction>
 
 #include "stdafx.h"
 
@@ -54,6 +53,7 @@ private slots:
     void on_action_settings_triggered();
 
 public slots:   
+
     // Индекс выбранной веб-камеры
     void webcamIndex();
 

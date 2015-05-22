@@ -1,7 +1,7 @@
 /*
    “Copyright 2015 Адаменко Михаил”
 
-    This file is part of Alizee.
+    This file is part of EyeDetection.
 
     Foobar is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,26 +17,29 @@
     along with Alizee.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#if defined __cplusplus
+#ifndef CONSTANTS_H
+#define CONSTANTS_H
 
-// C++ includes
-#include <iostream>
-#include <queue>
-#include <stdio.h>
-#include <math.h>
+// Size constants
+const int eyePercentTop     =   25;
+const int eyePercentSide    =   13;
+const int eyePercentHeight  =   30;
+const int eyePercentWidth   =   35;
 
-// OpenCV includes
-#include <opencv2/core/core.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/opencv.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/objdetect/objdetect.hpp>
-#include <opencv/cv.h>
+// Preprocessing
+const bool smoothFaceImage      =   false;
+const float smoothFaceFactor    =   0.005;
 
-// Qt includes
-#include <QtCore>
-#include <QMessageBox>
-#include <QtDebug>
+// Algorithm Parameters
+const int fastEyeWidth          = 50;
+const int weightBlurSize        = 5;
+const bool enableWeight         = true;
+const float weightDivisor       = 1.0;
+const double gradientThreshold  = 50.0;
 
-#endif // STDAFX
+// Postprocessing
+const bool enablePostProcess        = true;
+const float postProcessThreshold    = 0.97;
+
+#endif // CONSTANTS_H
 

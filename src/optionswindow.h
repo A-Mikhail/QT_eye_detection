@@ -1,7 +1,7 @@
 /*
    “Copyright 2015 Адаменко Михаил”
 
-    This file is part of Alizee.
+    This file is part of EyeDetection.
 
     Foobar is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,20 +17,27 @@
     along with Alizee.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "aboutwindow.h"
-#include "ui_aboutwindow.h"
+#ifndef OPTIONSWINDOW_H
+#define OPTIONSWINDOW_H
 
-aboutWindow::aboutWindow(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::aboutWindow)
-{
-    ui->setupUi(this);
+#include <QWidget>
 
-    this->setStyleSheet("background-color: #333333;");
-
+namespace Ui {
+class optionsWindow;
 }
 
-aboutWindow::~aboutWindow()
+class optionsWindow : public QWidget
 {
-    delete ui;
-}
+    Q_OBJECT
+
+public:
+    explicit optionsWindow(QWidget *parent = 0);
+    ~optionsWindow();
+
+private slots:
+
+private:
+    Ui::optionsWindow *ui;
+};
+
+#endif // OPTIONSWINDOW_H

@@ -7,7 +7,7 @@
 #-------------------------------------------------
 #   “Copyright 2015 Адаменко Михаил”
 #
-#   This file is part of Alizee.
+#   This file is part of EyeDetection.
 
 #   Foobar is free software: you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 #   GNU General Public License for more details.
 
 #   You should have received a copy of the GNU General Public License
-#   along with Alizee.  If not, see <http://www.gnu.org/licenses/>.
+#   along with EyeDetection.  If not, see <http://www.gnu.org/licenses/>.
 #
 #-------------------------------------------------
 
@@ -28,11 +28,11 @@ QT += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = AlizeeQt
+TARGET = EyeDetection
 TEMPLATE = app
 
 INCLUDEPATH += D:\OpenCV_withQt\debug\install\include
-INCLUDEPATH += C:\Users\micha_000\Desktop\Pr.Alizee\AlizeeQt\videoInput\include
+INCLUDEPATH += C:\Users\micha_000\Desktop\Pr.Alizee\EyeDetection\src\videoInput\include
 
 LIBS += D:\OpenCV_withQt\debug\bin\libopencv_core2410d.dll
 LIBS += D:\OpenCV_withQt\debug\bin\libopencv_contrib2410d.dll
@@ -41,16 +41,16 @@ LIBS += D:\OpenCV_withQt\debug\bin\libopencv_imgproc2410d.dll
 LIBS += D:\OpenCV_withQt\debug\bin\libopencv_calib3d2410d.dll
 LIBS += D:\OpenCV_withQt\debug\bin\libopencv_objdetect2410d.dll
 
-LIBS += C:\Users\micha_000\Desktop\Pr.Alizee\AlizeeQt\videoInput\libvideoInput.a
-LIBS += C:\Users\micha_000\Desktop\Pr.Alizee\AlizeeQt\videoInput\ddraw.lib
-LIBS += C:\Users\micha_000\Desktop\Pr.Alizee\AlizeeQt\videoInput\dxguid.lib
-LIBS += C:\Users\micha_000\Desktop\Pr.Alizee\AlizeeQt\videoInput\glfw.lib
-LIBS += C:\Users\micha_000\Desktop\Pr.Alizee\AlizeeQt\videoInput\ole32.lib
-LIBS += C:\Users\micha_000\Desktop\Pr.Alizee\AlizeeQt\videoInput\oleaut32.lib
-LIBS += C:\Users\micha_000\Desktop\Pr.Alizee\AlizeeQt\videoInput\strmbasd.lib
-LIBS += C:\Users\micha_000\Desktop\Pr.Alizee\AlizeeQt\videoInput\strmbase.lib
-LIBS += C:\Users\micha_000\Desktop\Pr.Alizee\AlizeeQt\videoInput\strmiids.lib
-LIBS += C:\Users\micha_000\Desktop\Pr.Alizee\AlizeeQt\videoInput\uuid.lib
+LIBS += C:\Users\micha_000\Desktop\Pr.Alizee\EyeDetection\src\videoInput\libvideoInput.a
+LIBS += C:\Users\micha_000\Desktop\Pr.Alizee\EyeDetection\src\videoInput\ddraw.lib
+LIBS += C:\Users\micha_000\Desktop\Pr.Alizee\EyeDetection\src\videoInput\dxguid.lib
+LIBS += C:\Users\micha_000\Desktop\Pr.Alizee\EyeDetection\src\videoInput\glfw.lib
+LIBS += C:\Users\micha_000\Desktop\Pr.Alizee\EyeDetection\src\videoInput\ole32.lib
+LIBS += C:\Users\micha_000\Desktop\Pr.Alizee\EyeDetection\src\videoInput\oleaut32.lib
+LIBS += C:\Users\micha_000\Desktop\Pr.Alizee\EyeDetection\src\videoInput\strmbasd.lib
+LIBS += C:\Users\micha_000\Desktop\Pr.Alizee\EyeDetection\src\videoInput\strmbase.lib
+LIBS += C:\Users\micha_000\Desktop\Pr.Alizee\EyeDetection\src\videoInput\strmiids.lib
+LIBS += C:\Users\micha_000\Desktop\Pr.Alizee\EyeDetection\src\videoInput\uuid.lib
 
 QMAKE_CXXFLAGS += -std=c++11
 CONFIG += precompile_header \
@@ -80,7 +80,7 @@ FORMS    += mainwindow.ui \
 RESOURCES += \
     resources.qrc \
 
-RC_FILE = alizee.rc
+RC_FILE = iconEyeDetection.rc
 
 DISTFILES += \
     videoInput/include/videoInput.h \

@@ -1,7 +1,7 @@
 /*
    “Copyright 2015 Адаменко Михаил”
 
-    This file is part of Alizee.
+    This file is part of EyeDetection.
 
     Foobar is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by

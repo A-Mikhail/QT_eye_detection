@@ -1,7 +1,7 @@
 /*
    “Copyright 2015 Адаменко Михаил”
 
-    This file is part of Alizee.
+    This file is part of EyeDetection.
 
     Foobar is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,25 +17,26 @@
     along with Alizee.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef ABOUTWINDOW_H
-#define ABOUTWINDOW_H
+#if defined __cplusplus
 
-#include <QMainWindow>
+// C++ includes
+#include <iostream>
+#include <queue>
+#include <stdio.h>
+#include <math.h>
 
-namespace Ui {
-class aboutWindow;
-}
+// OpenCV includes
+#include <opencv2/core/core.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/opencv.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/objdetect/objdetect.hpp>
+#include <opencv/cv.h>
 
-class aboutWindow : public QMainWindow
-{
-    Q_OBJECT
+// Qt includes
+#include <QtCore>
+#include <QMessageBox>
+#include <QtDebug>
 
-public:
-    explicit aboutWindow(QWidget *parent = 0);
-    ~aboutWindow();
+#endif // STDAFX
 
-private:
-    Ui::aboutWindow *ui;
-};
-
-#endif // ABOUTWINDOW_H
