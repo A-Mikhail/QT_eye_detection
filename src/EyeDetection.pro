@@ -93,4 +93,8 @@ DISTFILES += \
     videoInput/strmbasd.lib \
     videoInput/strmbase.lib \
     videoInput/strmiids.lib \
-    videoInput/uuid.lib
+    videoInput/uuid.lib \
+    haarcascade/haarcascade_eye.xml \
+    haarcascade/haarcascade_frontalface_default.xml
+
+
