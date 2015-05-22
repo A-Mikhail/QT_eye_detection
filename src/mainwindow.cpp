@@ -14,7 +14,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with Alizee.  If not, see <http://www.gnu.org/licenses/>.
+    along with EyeDetection.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <QtWidgets>
@@ -33,10 +33,6 @@ using namespace cv;
 
 void detectAndDisplay(Mat frame);
 
-// Подключение haarcascade 
-String face_cascade_name = "C:\\Users\\micha_000\\Desktop\\Pr.Alizee\\AlizeeQt\\haarcascade_frontalface_default.xml";
-String eye_cascade_name = "C:\\Users\\micha_000\\Desktop\\Pr.Alizee\\AlizeeQt\\haarcascade_eye.xml";
-
 CascadeClassifier face_cascade;
 CascadeClassifier eye_cascade;
 
@@ -53,6 +49,17 @@ Mat skinCrCbHist = Mat::zeros(Size(256, 256), CV_8UC1);
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    // Путь к haarcascade
+    QString face_cascade_path = QString(QCoreApplication::applicationDirPath() + "/haarcascade/haarcascade_frontalface_default.xml");
+    QString eye_cascade_path = QString(QCoreApplication::applicationDirPath() + "/haarcascade/haarcascade_eye.xml");
+
+    String face_cascade_utf8 = face_cascade_path.toUtf8().constData();
+    String eye_cascade_utf8 = eye_cascade_path.toUtf8().constData();
+
+    // Подключение haarcascade
+    String face_cascade_name   = face_cascade_utf8;
+    String eye_cascade_name    = eye_cascade_utf8;
 
     // Сообщения об отсутствии face_cascade или eye_cascade
     if( !face_cascade.load(face_cascade_name) ) {QMessageBox::critical(this,
