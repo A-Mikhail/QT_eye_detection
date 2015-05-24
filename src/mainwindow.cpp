@@ -36,6 +36,8 @@ void detectAndDisplay(Mat frame);
 CascadeClassifier face_cascade;
 CascadeClassifier eye_cascade;
 
+findEyeCenter fecenter;
+
 RNG rng(12345);
 Mat debugImage;
 Mat skinCrCbHist = Mat::zeros(Size(256, 256), CV_8UC1);
@@ -49,6 +51,8 @@ Mat skinCrCbHist = Mat::zeros(Size(256, 256), CV_8UC1);
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    /*-------- haarcascade --------*/
 
     // Путь к haarcascade
     QString face_cascade_path = QString(QCoreApplication::applicationDirPath() + "/haarcascade/haarcascade_frontalface_default.xml");
@@ -68,9 +72,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     if( !eye_cascade.load(eye_cascade_name) ){QMessageBox::critical(this,
         "Ошибка!", "Ошибка загрузки eye_cascade", QMessageBox::Ok); return; };
 
-    ellipse(skinCrCbHist, Point(113, 155.6), Size(23.4, 15.2),
-            43.0, 0.0, 360.0, Scalar(255, 255, 255), -1);
-
     /*-------- Создание меню на главной форме --------*/
 
     QWidget *widget = new QWidget(this);
@@ -79,14 +80,28 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     layout->setMargin(0);
     widget->setStyleSheet("background-color: #151515; height: 30%;");
 
-    // Кнопка "Меню"
-    mainButton = new QPushButton("Меню", widget);
-    mainButton->setStyleSheet("color: #fff");
-    layout->addWidget(mainButton);
+    // Кнопка "Выход"
+    exitButton = new QPushButton("Выход", widget);
+    exitButton->setStyleSheet("color: #fff");
 
-    // Кнопка "Помощь"
-    helpButton = new QPushButton("Помощь", widget);
+    connect(exitButton, SIGNAL(clicked()), this, SLOT(on_action_exit_triggered()));
+
+    layout->addWidget(exitButton);
+
+    // Кнопка "Настройки"
+    settingsButton = new QPushButton("Настройки", widget);
+    settingsButton->setStyleSheet("color: #fff");
+
+    connect(settingsButton, SIGNAL(clicked()), this, SLOT(on_action_settings_triggered()));
+
+    layout->addWidget(settingsButton);
+
+    // Кнопка "О программе"
+    helpButton = new QPushButton("О программе", widget);
     helpButton->setStyleSheet("color: #fff");
+
+    connect(helpButton, SIGNAL(clicked()), this, SLOT(on_action_about_triggered()));
+
     layout->addWidget(helpButton);
 
     // Выпадающий список на виджете
@@ -109,6 +124,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     // Получение индекса выбранной веб-камеры
     connect(combobox, SIGNAL(activated(QString)), this, SLOT(webcamIndex()));
+
+    ellipse(skinCrCbHist, Point(113, 155.6), Size(23.4, 15.2),
+            43.0, 0.0, 360.0, Scalar(255, 255, 255), -1);
 }
 
 void MainWindow::webcamIndex()
@@ -126,15 +144,11 @@ void MainWindow::webcamIndex()
         return; // выход
 
     } else {
-
         // Инициализация таймера с обновлением в 120мс.
         tmrTimer = new QTimer(this);
         connect(tmrTimer, SIGNAL(timeout()), this, SLOT(processFrameAndUpdateGUI()));
-        tmrTimer->start(120);
-
+        tmrTimer->start(1000/25);
     }
-
-    qDebug() << webcamIndexText;
 }
 
 /*
@@ -151,30 +165,29 @@ void MainWindow::processFrameAndUpdateGUI()
     // зеркальное отображение
     flip(frame, frame, 1);
 
+    // стандартные цвета на фрейм веб-камеры
     cvtColor(frame, frame, CV_BGR2RGB);
 
     if (!frame.empty())
     {
         detectAndDisplay(frame);
+
     } else {
         QMessageBox::warning(this, "Ошибка!", "Камера не найдена");
 
-        this -> close();
+        this->close();
     }
 
-    ui -> lblWebCam -> setPixmap(QPixmap::fromImage(qimgOriginal));
+    ui->lblWebCam->setPixmap(QPixmap::fromImage(qimgOriginal));
 }
 
 /*
 * MainWindow::findEyes
-* Функция отображения изображения с веб-камеры в lblWebCam
+* Функция поиска глаз
 */
 void MainWindow::findEyes(Mat frame_gray, Rect face)
 {
-    findEyeCenter fecenter;
-
     Mat faceROI = frame_gray(face);
-    Mat debugFace = faceROI;
 
     if (smoothFaceImage)
     {
@@ -194,49 +207,15 @@ void MainWindow::findEyes(Mat frame_gray, Rect face)
                         eye_region_top, eye_region_width, eye_region_height);
 
     // Поиск центра глаза
-    Point leftPupil = fecenter.eyeCenter(faceROI, leftEyeRegion);
-    Point rightPupil = fecenter.eyeCenter(faceROI, rightEyeRegion);
+    fecenter.eyeCenter(faceROI, leftEyeRegion);
+    fecenter.eyeCenter(faceROI, rightEyeRegion);
 
-    // Смена координат центра глаз относительно лица
-    rightPupil.x += rightEyeRegion.x;
-    rightPupil.y += rightEyeRegion.y;
 
-    leftPupil.x += leftEyeRegion.x;
-    leftPupil.y += leftEyeRegion.y;
+   /* Mat cropimage(faceROI.rows, faceROI.cols);
 
-    // Отрисовка центра глаз
-    circle(debugFace, rightPupil, 1, 1234);
-    circle(debugFace, leftPupil, 1, 1234);
-}
+    imwrite("cropimage.jpg", cropimage);
 
-/*
-* MainWindow::findSkin
-* Функция отображения изображения с веб-камеры в lblWebCam
-*/
-Mat MainWindow::findSkin(Mat &frame)
-{
-    Mat input;
-    Mat output = Mat(frame.rows, frame.cols, CV_8U);
-
-    cvtColor(frame, input, CV_BGR2YCrCb);
-
-    for (int y = 0; y < input.rows; ++y)
-    {
-        const Vec3b *Mr = input.ptr<Vec3b>(y);
-        Vec3b *Or = frame.ptr<Vec3b>(y);
-
-        for (int x = 0; x < input.cols; ++x)
-        {
-            Vec3b ycrcb = Mr[x];
-
-            if (skinCrCbHist.at<uchar>(ycrcb[1], ycrcb[2]) == 0)
-            {
-                Or[x] = Vec3b(0, 0, 0);
-            }
-        }
-    }
-
-    return output;
+    qDebug("1");*/
 }
 
 /*
@@ -253,14 +232,19 @@ void MainWindow::detectAndDisplay(Mat frame)
 
     face_cascade.detectMultiScale(frame, faces, 1.1, 2, 0|CV_HAAR_SCALE_IMAGE|CV_HAAR_FIND_BIGGEST_OBJECT, Size(150, 150));
 
-    /*for (int i = 0; i < faces.size(); i++)
+    /* отображение прямоугольника лица
+    for (int i = 0; i < faces.size(); i++)
     {
-        rectangle(frame_gray, faces[i], 1234);
-    }*/
+        rectangle(frame, faces[i], 1234);
+    }
+    */
 
     if (faces.size() > 0)
     {
         findEyes(frame, faces[0]);
+
+    } else {
+        qDebug("0");
     }
 }
 

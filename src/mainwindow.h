@@ -62,7 +62,6 @@ public slots:
 
     // Поиск глаз
     void findEyes(cv::Mat frame_gray, cv::Rect face);
-    cv::Mat findSkin (cv::Mat &frame);
 
     // Определение области глаз и отображение в окне
     void detectAndDisplay(cv::Mat frame);
@@ -74,8 +73,9 @@ private:
     optionsWindow       *optionswindow      = 0;
 
     // Кнопки меню
+    QPushButton* exitButton;
+    QPushButton* settingsButton;
     QPushButton* helpButton;
-    QPushButton* mainButton;
 
     QComboBox* combobox;
 

@@ -31,14 +31,14 @@ const bool smoothFaceImage      =   false;
 const float smoothFaceFactor    =   0.005;
 
 // Algorithm Parameters
-const int fastEyeWidth          = 50;
+const int fastEyeWidth          = 5;
 const int weightBlurSize        = 5;
 const bool enableWeight         = true;
 const float weightDivisor       = 1.0;
 const double gradientThreshold  = 50.0;
 
 // Postprocessing
-const bool enablePostProcess        = true;
+const bool enablePostProcess        = false;
 const float postProcessThreshold    = 0.97;
 
 #endif // CONSTANTS_H

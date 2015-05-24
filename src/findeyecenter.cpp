@@ -32,7 +32,7 @@ helpers h;
 
 Point unscalePoint(Point p, Rect origSize)
 {
-    float ratio = ( ((float)fastEyeWidth) / origSize.width);
+    float ratio = (((float)fastEyeWidth) / origSize.width);
 
     int x = round(p.x / ratio);
     int y = round(p.y / ratio);
@@ -42,7 +42,7 @@ Point unscalePoint(Point p, Rect origSize)
 
 void scaleToFastSize(const Mat &src, Mat &dst)
 {
-    resize(src, dst, Size(fastEyeWidth,( ((float)fastEyeWidth) / src.cols ) * src.rows) );
+    resize(src, dst, Size(fastEyeWidth,(((float)fastEyeWidth) / src.cols ) * src.rows));
 }
 
 Mat computeMatXGradient(const Mat &mat)
@@ -242,10 +242,10 @@ Mat floodKillEdges(Mat &mat)
         Point np(p.x + 1, p.y); // right
         if (floodShouldPushPoint(np, mat)) toDo.push(np);
 
-        np.x = p.x - 1; np.y = p.y; // left;
+        np.x = p.x - 1; np.y = p.y; // left
         if (floodShouldPushPoint(np, mat)) toDo.push(np);
 
-        np.x = p.x; np.y = p.y + 1; // down;
+        np.x = p.x; np.y = p.y + 1; // down
         if (floodShouldPushPoint(np, mat)) toDo.push(np);
 
         np.x = p.x; np.y = p.y - 1; // up
