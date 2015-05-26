@@ -34,12 +34,12 @@ TEMPLATE = app
 INCLUDEPATH += D:\OpenCV_withQt\debug\install\include
 INCLUDEPATH += C:\Users\micha_000\Desktop\Pr.Alizee\EyeDetection\src\videoInput\include
 
-LIBS += D:\OpenCV_withQt\debug\bin\libopencv_core2410d.dll
-LIBS += D:\OpenCV_withQt\debug\bin\libopencv_contrib2410d.dll
-LIBS += D:\OpenCV_withQt\debug\bin\libopencv_highgui2410d.dll
-LIBS += D:\OpenCV_withQt\debug\bin\libopencv_imgproc2410d.dll
-LIBS += D:\OpenCV_withQt\debug\bin\libopencv_calib3d2410d.dll
-LIBS += D:\OpenCV_withQt\debug\bin\libopencv_objdetect2410d.dll
+LIBS += D:\OpenCV_withQt\release\bin\libopencv_core2410.dll
+LIBS += D:\OpenCV_withQt\release\bin\libopencv_contrib2410.dll
+LIBS += D:\OpenCV_withQt\release\bin\libopencv_highgui2410.dll
+LIBS += D:\OpenCV_withQt\release\bin\libopencv_imgproc2410.dll
+LIBS += D:\OpenCV_withQt\release\bin\libopencv_calib3d2410.dll
+LIBS += D:\OpenCV_withQt\release\bin\libopencv_objdetect2410.dll
 
 LIBS += C:\Users\micha_000\Desktop\Pr.Alizee\EyeDetection\src\videoInput\libvideoInput.a
 LIBS += C:\Users\micha_000\Desktop\Pr.Alizee\EyeDetection\src\videoInput\ddraw.lib

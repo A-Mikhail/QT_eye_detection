@@ -26,10 +26,6 @@ const int eyePercentSide    =   13;
 const int eyePercentHeight  =   30;
 const int eyePercentWidth   =   35;
 
-// Preprocessing
-const bool smoothFaceImage      =   false;
-const float smoothFaceFactor    =   0.005;
-
 // Algorithm Parameters
 const int fastEyeWidth          = 5;
 const int weightBlurSize        = 5;

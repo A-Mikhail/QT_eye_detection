@@ -38,6 +38,9 @@ CascadeClassifier eye_cascade;
 
 findEyeCenter fecenter;
 
+int filenumber;
+string filename;
+
 RNG rng(12345);
 Mat debugImage;
 Mat skinCrCbHist = Mat::zeros(Size(256, 256), CV_8UC1);
@@ -124,11 +127,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     // Получение индекса выбранной веб-камеры
     connect(combobox, SIGNAL(activated(QString)), this, SLOT(webcamIndex()));
-
-    ellipse(skinCrCbHist, Point(113, 155.6), Size(23.4, 15.2),
-            43.0, 0.0, 360.0, Scalar(255, 255, 255), -1);
 }
 
+/*
+* MainWindow::processFrameAndUpdateGUI
+* Открытие веб-камеры по индексу, запуск таймера
+*/
 void MainWindow::webcamIndex()
 {
     int webcamIndexText = combobox->currentIndex();
@@ -144,7 +148,7 @@ void MainWindow::webcamIndex()
         return; // выход
 
     } else {
-        // Инициализация таймера с обновлением в 120мс.
+        // Инициализация таймера с обновлением в 25fps.
         tmrTimer = new QTimer(this);
         connect(tmrTimer, SIGNAL(timeout()), this, SLOT(processFrameAndUpdateGUI()));
         tmrTimer->start(1000/25);
@@ -189,12 +193,6 @@ void MainWindow::findEyes(Mat frame_gray, Rect face)
 {
     Mat faceROI = frame_gray(face);
 
-    if (smoothFaceImage)
-    {
-        double sigma = smoothFaceFactor * face.width;
-        GaussianBlur(faceROI, faceROI, Size(0, 0), sigma);
-    }
-
     // Поиск региона глаз и отрисовка
     int eye_region_width    = face.width  * (eyePercentHeight / 100.0);
     int eye_region_height   = face.height * (eyePercentHeight / 100.0);
@@ -209,13 +207,6 @@ void MainWindow::findEyes(Mat frame_gray, Rect face)
     // Поиск центра глаза
     fecenter.eyeCenter(faceROI, leftEyeRegion);
     fecenter.eyeCenter(faceROI, rightEyeRegion);
-
-
-   /* Mat cropimage(faceROI.rows, faceROI.cols);
-
-    imwrite("cropimage.jpg", cropimage);
-
-    qDebug("1");*/
 }
 
 /*
@@ -225,23 +216,84 @@ void MainWindow::findEyes(Mat frame_gray, Rect face)
 void MainWindow::detectAndDisplay(Mat frame)
 {
     vector<Rect> faces;
-
+    vector<Rect> eyes;
     vector<Mat> rgbChannels(3);
 
     split(frame, rgbChannels);
 
-    face_cascade.detectMultiScale(frame, faces, 1.1, 2, 0|CV_HAAR_SCALE_IMAGE|CV_HAAR_FIND_BIGGEST_OBJECT, Size(150, 150));
+    // Обнаружение лица
+    face_cascade.detectMultiScale(frame, faces, 1.1, 2,
+                                  0 |CV_HAAR_SCALE_IMAGE|CV_HAAR_FIND_BIGGEST_OBJECT, Size(150, 150));
 
-    /* отображение прямоугольника лица
-    for (int i = 0; i < faces.size(); i++)
+
+    // Обнаружение глаз
+    eye_cascade.detectMultiScale(frame, eyes, 1.1, 2, 0 |CV_HAAR_SCALE_IMAGE|CV_HAAR_FIND_BIGGEST_OBJECT, Size(30, 30) );
+
+    // отображение прямоугольника лица
+    /*for (int i = 0; i < faces.size(); i++)
     {
         rectangle(frame, faces[i], 1234);
-    }
-    */
+    }*/
 
     if (faces.size() > 0)
     {
         findEyes(frame, faces[0]);
+
+        Mat crop;
+        Mat gray;
+
+        // Set Region of Interest
+        cv::Rect roi_b;
+        cv::Rect roi_c;
+
+        size_t index_current = 0; // index of current element
+        int area_current = 0; // area of current element
+
+        size_t index_biggest_element = 0; // index of biggest element
+        int area_biggest_element = 0; // area of biggest element
+
+
+        // Сохранение найденной области в .png файл
+        for (index_current = 0; index_current < eyes.size(); index_current++) // Iterate through all current elements (detected faces)
+        {
+            roi_c.x = eyes[index_current].x;
+            roi_c.y = eyes[index_current].y;
+            roi_c.width = (eyes[index_current].width);
+            roi_c.height = (eyes[index_current].height);
+
+            area_current = roi_c.width * roi_c.height; // Get the area of current element (detected face)
+
+            roi_b.x = eyes[index_biggest_element].x;
+            roi_b.y = eyes[index_biggest_element].y;
+            roi_b.width = (eyes[index_biggest_element].width);
+            roi_b.height = (eyes[index_biggest_element].height);
+
+            area_biggest_element = roi_b.width * roi_b.height; // Get the area of biggest element, at beginning it is same as "current" element
+
+            if (area_current > area_biggest_element)
+            {
+                index_biggest_element = index_current;
+                roi_b.x = eyes[index_biggest_element].x;
+                roi_b.y = eyes[index_biggest_element].y;
+                roi_b.width = (eyes[index_biggest_element].width);
+                roi_b.height = (eyes[index_biggest_element].height);
+            }
+
+            crop = frame(roi_b);
+            cvtColor(crop, gray, CV_BGR2GRAY); // Convert cropped image to Grayscale
+
+            // Form a filename
+            filename = "";
+            stringstream ssfn;
+            ssfn << filenumber << ".png";
+            filename = ssfn.str();
+            filenumber++;
+
+            // Сохранение в .png формате
+            imwrite(filename, gray);
+        }
+
+        qDebug("1");
 
     } else {
         qDebug("0");
