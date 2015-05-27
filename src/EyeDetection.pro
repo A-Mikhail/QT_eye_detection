@@ -71,7 +71,8 @@ HEADERS  += mainwindow.h \
     findeyecenter.h \
     constants.h \
     helpers.h \
-    optionswindow.h
+    optionswindow.h \
+    version.h
 
 FORMS    += mainwindow.ui \
             aboutwindow.ui \
@@ -80,7 +81,7 @@ FORMS    += mainwindow.ui \
 RESOURCES += \
     resources.qrc \
 
-RC_FILE = iconEyeDetection.rc
+RC_FILE = EyeDetection.rc
 
 DISTFILES += \
     videoInput/include/videoInput.h \

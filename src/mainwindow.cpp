@@ -36,15 +36,8 @@ void detectAndDisplay(Mat frame);
 CascadeClassifier face_cascade;
 CascadeClassifier eye_cascade;
 
-findEyeCenter fecenter;
-
 int filenumber;
 string filename;
-
-RNG rng(12345);
-Mat debugImage;
-Mat skinCrCbHist = Mat::zeros(Size(256, 256), CV_8UC1);
-
 
 /*
 * MainWindow::MainWindow
@@ -70,10 +63,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     // Сообщения об отсутствии face_cascade или eye_cascade
     if( !face_cascade.load(face_cascade_name) ) {QMessageBox::critical(this,
-        "Ошибка!", "Ошибка загрузки face_cascade", QMessageBox::Ok); return; };
+        "Ошибка!", "Ошибка загрузки face_cascade", QMessageBox::Ok); return;};
 
     if( !eye_cascade.load(eye_cascade_name) ){QMessageBox::critical(this,
-        "Ошибка!", "Ошибка загрузки eye_cascade", QMessageBox::Ok); return; };
+        "Ошибка!", "Ошибка загрузки eye_cascade", QMessageBox::Ok); return;};
 
     /*-------- Создание меню на главной форме --------*/
 
@@ -127,6 +120,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     // Получение индекса выбранной веб-камеры
     connect(combobox, SIGNAL(activated(QString)), this, SLOT(webcamIndex()));
+}
+
+void MainWindow::haarcascade()
+{
+
 }
 
 /*
@@ -191,6 +189,8 @@ void MainWindow::processFrameAndUpdateGUI()
 */
 void MainWindow::findEyes(Mat frame_gray, Rect face)
 {
+    findEyeCenter fecenter;
+
     Mat faceROI = frame_gray(face);
 
     // Поиск региона глаз и отрисовка
@@ -284,9 +284,9 @@ void MainWindow::detectAndDisplay(Mat frame)
 
             // Form a filename
             filename = "";
-            stringstream ssfn;
-            ssfn << filenumber << ".png";
-            filename = ssfn.str();
+            stringstream ssfilename;
+            ssfilename << filenumber << ".png";
+            filename = ssfilename.str();
             filenumber++;
 
             // Сохранение в .png формате

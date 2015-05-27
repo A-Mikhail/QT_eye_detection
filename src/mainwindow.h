@@ -54,6 +54,8 @@ private slots:
 
 public slots:   
 
+    void haarcascade();
+
     // Индекс выбранной веб-камеры
     void webcamIndex();
 

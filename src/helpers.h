@@ -16,6 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with EyeDetection.  If not, see <http://www.gnu.org/licenses/>.
 */
+
 #ifndef HELPERS_H
 #define HELPERS_H
 
