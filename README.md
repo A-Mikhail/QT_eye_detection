@@ -7,17 +7,17 @@
 
 # To-Do list:
 
-* 1. refactor code
-* 2. optimize code
-* 3. add security code 
-* 4. translate comment on english, remove useless comments
-* ?. design program (options, about, combobox, main menu)
+   1. refactor code
+   2. optimize code
+   3. add security code 
+   4. translate comment on english, remove useless comments
+   ?. design program (options, about, combobox, main menu)
 
 # Known bugs:
 
-* 1. if haarcascade file not found, after close message box, program starts without interface
-* 2. change webcam not work correct
-* 3. options window is blank - (not bug)
+   1. if haarcascade file not found, after close message box, program starts without interface
+   2. change webcam not work correct
+   3. options window is blank - (not bug)
 
 # Documentation
 * OpenCV - http://docs.opencv.org/index.html
