@@ -1,0 +1,62 @@
+QWidget#widget {
+    border-bottom: 1px solid #335566;
+    height: 100%;
+}
+
+QPushButton#exitButton {
+    border: 0;
+    height: 35%;
+}
+
+QPushButton#settingsButton {
+    border: 0;
+    height: 35%;
+}
+
+QPushButton#aboutButton {
+    border: 0;
+    height: 35%;
+}
+
+QLabel#webcamLabel {
+    qproperty-alignment: 'AlignCenter | AlignRight';
+}
+
+QComboBox {
+    border: 0;
+    padding-right: 30%;
+    margin-left: 5%;
+    height: 30%;
+}
+
+/* hover */
+QPushButton#exitButton:hover {
+    border-bottom: 3px solid #335566;
+}
+
+QPushButton#settingsButton:hover {
+    border-bottom: 3px solid #335566;
+}
+
+QPushButton#aboutButton:hover {
+    border-bottom: 3px solid #335566;
+}
+
+/* pressed */
+QPushButton#exitButton:pressed {
+    color: #335566;
+    border-bottom: 3px solid #335566;
+}
+
+QPushButton#settingsButton:pressed {
+    color: #335566;
+    border-bottom: 3px solid #335566;
+}
+
+QPushButton#aboutButton:pressed {
+    color: #335566;
+    border-bottom: 3px solid #335566;
+}
+
+
+

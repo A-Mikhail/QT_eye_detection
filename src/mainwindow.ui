@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>699</width>
-    <height>524</height>
+    <width>703</width>
+    <height>528</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,8 +19,8 @@
    </property>
    <property name="minimumSize">
     <size>
-     <width>0</width>
-     <height>0</height>
+     <width>512</width>
+     <height>256</height>
     </size>
    </property>
    <property name="mouseTracking">
@@ -68,14 +68,26 @@
         <height>0</height>
        </size>
       </property>
+      <property name="font">
+       <font>
+        <family>Segoe UI Light</family>
+        <pointsize>22</pointsize>
+       </font>
+      </property>
+      <property name="mouseTracking">
+       <bool>false</bool>
+      </property>
       <property name="autoFillBackground">
-       <bool>true</bool>
+       <bool>false</bool>
       </property>
       <property name="text">
-       <string/>
+       <string>Выберите веб-камеру</string>
       </property>
       <property name="scaledContents">
        <bool>true</bool>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
       </property>
      </widget>
     </item>

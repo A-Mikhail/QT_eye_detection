@@ -20,14 +20,20 @@
 #include <QApplication>
 
 #include "mainwindow.h"
+#include "popupwindow.h"
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
+    popupWindow p;
     MainWindow w;
 
     w.show();
+
+    if (!QFile::exists("user.dat") ) {
+       p.show();
+    }
 
     return a.exec();
 }

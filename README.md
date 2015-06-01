@@ -17,12 +17,10 @@
 
 * 1. if haarcascade file not found, after close message box, program starts without interface
 * 2. change webcam not work correct
-* 3. options window is blank - (not bug)
 
 # Documentation
 * OpenCV - http://docs.opencv.org/index.html
 * Qt - http://doc.qt.io/
-* EyeHaarcascade - http://www-personal.umich.edu/~shameem/haarcascade_eye.html
 
 # License
  “Copyright 2015 Mikhail Adamenko”

@@ -20,6 +20,9 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <QtWidgets>
+#include <QWidgetAction>
+
 #include <QMainWindow>
 #include <QComboBox>
 
@@ -54,8 +57,6 @@ private slots:
 
 public slots:   
 
-    void haarcascade();
-
     // Индекс выбранной веб-камеры
     void webcamIndex();
 
@@ -74,12 +75,18 @@ private:
     aboutWindow         *aboutwindow        = 0;
     optionsWindow       *optionswindow      = 0;
 
+    QHBoxLayout *layout;
+    QWidget *widget;
+
     // Кнопки меню
     QPushButton* exitButton;
     QPushButton* settingsButton;
-    QPushButton* helpButton;
+    QPushButton* aboutButton;
 
+    QLabel* webcamLabel;
     QComboBox* combobox;
+
+    QSpacerItem* horizontalSpacer;
 
     cv::Mat frame;
 

@@ -17,7 +17,7 @@
     along with EyeDetection.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "findeyecenter.h"
+#include "findeye.h"
 #include "stdafx.h"
 
 #include "constants.h"
@@ -106,7 +106,7 @@ void testPossibleCentersFormula(int x, int y, const Mat &weight, double gx, doub
     }
 }
 
-Point findEyeCenter::eyeCenter(Mat face, Rect eye)
+Point findEye::eyeCenter(Mat face, Rect eye)
 {
     Mat eyeROIUnscaled = face(eye);
     Mat eyeROI;
@@ -259,5 +259,3 @@ Mat floodKillEdges(Mat &mat)
     return mask;
 
 }
-
-

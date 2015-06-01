@@ -17,16 +17,13 @@
     along with EyeDetection.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <QtWidgets>
-#include <QWidgetAction>
-
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
 #include "videoInput.h"
 #include "constants.h"
 
-#include "findeyecenter.h"
+#include "findeye.h"
 
 using namespace std;
 using namespace cv;
@@ -36,8 +33,11 @@ void detectAndDisplay(Mat frame);
 CascadeClassifier face_cascade;
 CascadeClassifier eye_cascade;
 
-int filenumber;
 string filename;
+int filenumber = 0;
+
+string folderName;
+string folderCreateCommand;
 
 /*
 * MainWindow::MainWindow
@@ -47,6 +47,16 @@ string filename;
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    /*-------- CSS --------*/
+
+    QFile style;
+
+    style.setFileName(":/qss/style.css");
+    style.open(QFile::ReadOnly);
+    QString qssStr = style.readAll();
+
+    qApp->setStyleSheet(qssStr);
 
     /*-------- haarcascade --------*/
 
@@ -70,15 +80,17 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     /*-------- Создание меню на главной форме --------*/
 
-    QWidget *widget = new QWidget(this);
-    QHBoxLayout *layout = new QHBoxLayout(widget);
+    widget = new QWidget(this);
+    layout = new QHBoxLayout(widget);
 
-    layout->setMargin(0);
-    widget->setStyleSheet("background-color: #151515; height: 30%;");
+    layout->setSpacing(0); // Убрать пробелы
+    layout->setMargin(0); // Убрать отсутпы
+
+    widget->setObjectName("widget");
 
     // Кнопка "Выход"
     exitButton = new QPushButton("Выход", widget);
-    exitButton->setStyleSheet("color: #fff");
+    exitButton->setObjectName("exitButton");
 
     connect(exitButton, SIGNAL(clicked()), this, SLOT(on_action_exit_triggered()));
 
@@ -86,27 +98,32 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     // Кнопка "Настройки"
     settingsButton = new QPushButton("Настройки", widget);
-    settingsButton->setStyleSheet("color: #fff");
+    settingsButton->setObjectName("settingsButton");
 
     connect(settingsButton, SIGNAL(clicked()), this, SLOT(on_action_settings_triggered()));
 
     layout->addWidget(settingsButton);
 
     // Кнопка "О программе"
-    helpButton = new QPushButton("О программе", widget);
-    helpButton->setStyleSheet("color: #fff");
+    aboutButton = new QPushButton("О программе", widget);
+    aboutButton->setObjectName("aboutButton");
 
-    connect(helpButton, SIGNAL(clicked()), this, SLOT(on_action_about_triggered()));
+    connect(aboutButton, SIGNAL(clicked()), this, SLOT(on_action_about_triggered()));
 
-    layout->addWidget(helpButton);
+    layout->addWidget(aboutButton);
+
+    // Поле "Веб-камера"
+    webcamLabel = new QLabel("Веб-камера: ", widget);
+    webcamLabel->setObjectName("webcamLabel");
+
+    layout->addWidget(webcamLabel);
 
     // Выпадающий список на виджете
     combobox = new QComboBox(widget);
-    combobox->setStyleSheet("color: #fff");
+
     layout->addWidget(combobox);
 
-    setMenuWidget(widget);
-
+    setMenuWidget(widget); // Установка меню
 
     /*-------- Получение списка веб-камер использую библиотеку videoinput --------*/
 
@@ -120,11 +137,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     // Получение индекса выбранной веб-камеры
     connect(combobox, SIGNAL(activated(QString)), this, SLOT(webcamIndex()));
-}
-
-void MainWindow::haarcascade()
-{
-
 }
 
 /*
@@ -173,11 +185,6 @@ void MainWindow::processFrameAndUpdateGUI()
     if (!frame.empty())
     {
         detectAndDisplay(frame);
-
-    } else {
-        QMessageBox::warning(this, "Ошибка!", "Камера не найдена");
-
-        this->close();
     }
 
     ui->lblWebCam->setPixmap(QPixmap::fromImage(qimgOriginal));
@@ -189,7 +196,7 @@ void MainWindow::processFrameAndUpdateGUI()
 */
 void MainWindow::findEyes(Mat frame_gray, Rect face)
 {
-    findEyeCenter fecenter;
+    findEye findeye;
 
     Mat faceROI = frame_gray(face);
 
@@ -205,70 +212,59 @@ void MainWindow::findEyes(Mat frame_gray, Rect face)
                         eye_region_top, eye_region_width, eye_region_height);
 
     // Поиск центра глаза
-    fecenter.eyeCenter(faceROI, leftEyeRegion);
-    fecenter.eyeCenter(faceROI, rightEyeRegion);
+    findeye.eyeCenter(faceROI, leftEyeRegion);
+    findeye.eyeCenter(faceROI, rightEyeRegion);
 }
 
 /*
 * MainWindow::detectAndDisplay
-* Функция отображения изображения с веб-камеры в lblWebCam
+* Определение и отображение контура глаз/лица на фрейме
 */
 void MainWindow::detectAndDisplay(Mat frame)
 {
     vector<Rect> faces;
     vector<Rect> eyes;
-    vector<Mat> rgbChannels(3);
-
-    split(frame, rgbChannels);
 
     // Обнаружение лица
     face_cascade.detectMultiScale(frame, faces, 1.1, 2,
                                   0 |CV_HAAR_SCALE_IMAGE|CV_HAAR_FIND_BIGGEST_OBJECT, Size(150, 150));
-
-
     // Обнаружение глаз
-    eye_cascade.detectMultiScale(frame, eyes, 1.1, 2, 0 |CV_HAAR_SCALE_IMAGE|CV_HAAR_FIND_BIGGEST_OBJECT, Size(30, 30) );
-
-    // отображение прямоугольника лица
-    /*for (int i = 0; i < faces.size(); i++)
-    {
-        rectangle(frame, faces[i], 1234);
-    }*/
+    eye_cascade.detectMultiScale(frame, eyes, 1.1, 2,
+                                 0 |CV_HAAR_SCALE_IMAGE|CV_HAAR_FIND_BIGGEST_OBJECT, Size(30, 30));
 
     if (faces.size() > 0)
     {
-        findEyes(frame, faces[0]);
+        findEyes(frame, faces[0]); // отображение контура области глаз
 
         Mat crop;
         Mat gray;
 
-        // Set Region of Interest
+        // Установка региона интереса
         cv::Rect roi_b;
         cv::Rect roi_c;
 
-        size_t index_current = 0; // index of current element
-        int area_current = 0; // area of current element
+        size_t index_current = 0; // индекс текущего элемента
+        int area_current = 0; // площадь текущего элемента
 
-        size_t index_biggest_element = 0; // index of biggest element
-        int area_biggest_element = 0; // area of biggest element
-
+        size_t index_biggest_element = 0; // индекс большего элемента
+        int area_biggest_element = 0; // площадь большего элемента
 
         // Сохранение найденной области в .png файл
-        for (index_current = 0; index_current < eyes.size(); index_current++) // Iterate through all current elements (detected faces)
+        for (index_current = 0; index_current < eyes.size(); index_current++)
         {
             roi_c.x = eyes[index_current].x;
             roi_c.y = eyes[index_current].y;
             roi_c.width = (eyes[index_current].width);
             roi_c.height = (eyes[index_current].height);
 
-            area_current = roi_c.width * roi_c.height; // Get the area of current element (detected face)
+            area_current = roi_c.width * roi_c.height; // Получить площадь текущего элемента
 
             roi_b.x = eyes[index_biggest_element].x;
             roi_b.y = eyes[index_biggest_element].y;
             roi_b.width = (eyes[index_biggest_element].width);
             roi_b.height = (eyes[index_biggest_element].height);
 
-            area_biggest_element = roi_b.width * roi_b.height; // Get the area of biggest element, at beginning it is same as "current" element
+            area_biggest_element = roi_b.width * roi_b.height; // Получить площадь большего элемента
 
             if (area_current > area_biggest_element)
             {
@@ -280,23 +276,32 @@ void MainWindow::detectAndDisplay(Mat frame)
             }
 
             crop = frame(roi_b);
-            cvtColor(crop, gray, CV_BGR2GRAY); // Convert cropped image to Grayscale
+            cvtColor(crop, gray, CV_BGR2GRAY); // Конвертация вырезанного изображения в серый цвет
 
-            // Form a filename
+            /*-------- Сохранение ROI в папку cropped --------*/
             filename = "";
-            stringstream ssfilename;
-            ssfilename << filenumber << ".png";
-            filename = ssfilename.str();
+            folderName = "cropped";
+
+            // Создание папки cropped
+            if(!QDir("cropped").exists())
+            {
+                QDir().mkdir("cropped");
+            }
+
             filenumber++;
 
-            // Сохранение в .png формате
-            imwrite(filename, gray);
+            if(filenumber > 10)
+            {
+                break;
+            } else {
+                stringstream ssfilename;
+                ssfilename << folderName << "/" << filenumber << "_eye" << ".png";
+
+                filename = ssfilename.str();
+
+                imwrite(filename, gray);
+            }
         }
-
-        qDebug("1");
-
-    } else {
-        qDebug("0");
     }
 }
 
@@ -337,4 +342,3 @@ MainWindow::~MainWindow()
 {
     delete ui;
 }
-

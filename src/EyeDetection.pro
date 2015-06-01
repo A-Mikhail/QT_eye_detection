@@ -33,6 +33,7 @@ TEMPLATE = app
 
 INCLUDEPATH += D:\OpenCV_withQt\debug\install\include
 INCLUDEPATH += C:\Users\micha_000\Desktop\Pr.Alizee\EyeDetection\src\videoInput\include
+INCLUDEPATH += C:\Users\micha_000\Desktop\physfsCMAKE\SysGCC\include
 
 LIBS += D:\OpenCV_withQt\release\bin\libopencv_core2410.dll
 LIBS += D:\OpenCV_withQt\release\bin\libopencv_contrib2410.dll
@@ -60,23 +61,26 @@ PRECOMPILED_HEADER = stdafx.h
 SOURCES  +=\
             mainwindow.cpp \
             aboutwindow.cpp \
-    findeyecenter.cpp \
-    helpers.cpp \
+    main.cpp \
     optionswindow.cpp \
-    main.cpp
+    helpers.cpp \
+    findeye.cpp \
+    popupwindow.cpp
 
 HEADERS  += mainwindow.h \
             aboutwindow.h \
             stdafx.h \
-    findeyecenter.h \
     constants.h \
-    helpers.h \
+    version.h \
     optionswindow.h \
-    version.h
+    helpers.h \
+    findeye.h \
+    popupwindow.h
 
 FORMS    += mainwindow.ui \
             aboutwindow.ui \
-    optionswindow.ui
+    optionswindow.ui \
+    popupwindow.ui
 
 RESOURCES += \
     resources.qrc \
@@ -97,5 +101,3 @@ DISTFILES += \
     videoInput/uuid.lib \
     haarcascade/haarcascade_eye.xml \
     haarcascade/haarcascade_frontalface_default.xml
-
-

@@ -17,17 +17,15 @@
     along with EyeDetection.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FINDEYECENTER_H
-#define FINDEYECENTER_H
+#ifndef FINDEYE_H
+#define FINDEYE_H
 
 #include "opencv2/imgproc/imgproc.hpp"
 
-class findEyeCenter
+class findEye
 {
-public:
-
-    cv::Point eyeCenter(cv::Mat face, cv::Rect eye);
-
+    public:
+        cv::Point eyeCenter(cv::Mat face, cv::Rect eye);
 };
 
-#endif // FINDEYECENTER_H
+#endif // FINDEYE_H
