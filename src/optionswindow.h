@@ -15,6 +15,11 @@ public:
     explicit optionsWindow(QWidget *parent = 0);
     ~optionsWindow();
 
+private slots:
+    void on_pushButton_clicked();
+
+    void on_toolButton_clicked();
+
 private:
     Ui::optionsWindow *ui;
 };
