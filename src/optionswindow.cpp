@@ -13,10 +13,10 @@ optionsWindow::optionsWindow(QWidget *parent) :
     QFile file("user.dat");
     file.open(QIODevice::ReadOnly);
     QDataStream in(&file);
-    QString text;
-    in >> text;
+    QString profileName;
+    in >> profileName;
 
-    ui->label_3->setText(text); // Текущий пользователь
+    ui->label_3->setText(profileName); // Текущий пользователь
 }
 
 optionsWindow::~optionsWindow()

@@ -69,6 +69,9 @@ public slots:
     // Определение области глаз и отображение в окне
     void detectAndDisplay(cv::Mat frame);
 
+    // вырезание области интереса (глаза)
+    void croppedROI();
+
 private:
     Ui::MainWindow *ui;
 

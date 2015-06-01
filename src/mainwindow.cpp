@@ -236,6 +236,14 @@ void MainWindow::detectAndDisplay(Mat frame)
     {
         findEyes(frame, faces[0]); // отображение контура области глаз
 
+        croppedROI();
+    }
+}
+
+void MainWindow::croppedROI()
+{
+    if (!QFile::exists("user.dat") ) {
+
         Mat crop;
         Mat gray;
 
@@ -248,6 +256,12 @@ void MainWindow::detectAndDisplay(Mat frame)
 
         size_t index_biggest_element = 0; // индекс большего элемента
         int area_biggest_element = 0; // площадь большего элемента
+
+        // Создание папки cropped
+        if(!QDir("cropped").exists())
+        {
+            QDir().mkdir("cropped");
+        }
 
         // Сохранение найденной области в .png файл
         for (index_current = 0; index_current < eyes.size(); index_current++)
@@ -275,27 +289,30 @@ void MainWindow::detectAndDisplay(Mat frame)
                 roi_b.height = (eyes[index_biggest_element].height);
             }
 
+            /*-------- Сохранение ROI в папку cropped --------*/
+
             crop = frame(roi_b);
             cvtColor(crop, gray, CV_BGR2GRAY); // Конвертация вырезанного изображения в серый цвет
 
-            /*-------- Сохранение ROI в папку cropped --------*/
             filename = "";
             folderName = "cropped";
 
-            // Создание папки cropped
-            if(!QDir("cropped").exists())
-            {
-                QDir().mkdir("cropped");
-            }
+            // Чтение из файла
+            QFile file("user.dat");
+            file.open(QIODevice::ReadOnly);
+            QDataStream in(&file);
+            QString profileName;
+            in >> profileName;
 
             filenumber++;
 
+            // Остановить сохранение при 10 файлах
             if(filenumber > 10)
             {
                 break;
             } else {
                 stringstream ssfilename;
-                ssfilename << folderName << "/" << filenumber << "_eye" << ".png";
+                ssfilename << folderName << "/" << profileName << "-" << filenumber << "_eye" << ".png";
 
                 filename = ssfilename.str();
 

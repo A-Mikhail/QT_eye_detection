@@ -17,13 +17,13 @@ popupWindow::~popupWindow()
 
 void popupWindow::on_pushButton_clicked()
 {
-    QString text = ui->lineEdit->text();
+    QString profileName = ui->lineEdit->text();
 
     // Создание файла user.dat с добавлением текста из lineEdit
     QFile file("user.dat");
     file.open(QIODevice::WriteOnly);
-    QDataStream out(&file);   // we will serialize the data into the file
-    out << QString(text);   // serialize a string
+    QDataStream out(&file);
+    out << QString(profileName);
 
     this->close();
 }
