@@ -223,27 +223,38 @@ void MainWindow::findEyes(Mat frame_gray, Rect face)
 void MainWindow::detectAndDisplay(Mat frame)
 {
     vector<Rect> faces;
-    vector<Rect> eyes;
 
     // Обнаружение лица
     face_cascade.detectMultiScale(frame, faces, 1.1, 2,
                                   0 |CV_HAAR_SCALE_IMAGE|CV_HAAR_FIND_BIGGEST_OBJECT, Size(150, 150));
-    // Обнаружение глаз
-    eye_cascade.detectMultiScale(frame, eyes, 1.1, 2,
-                                 0 |CV_HAAR_SCALE_IMAGE|CV_HAAR_FIND_BIGGEST_OBJECT, Size(30, 30));
-
     if (faces.size() > 0)
     {
         findEyes(frame, faces[0]); // отображение контура области глаз
 
-        croppedROI();
+        croppedROI(frame);
     }
 }
 
-void MainWindow::croppedROI()
+/*
+* MainWindow::croppedROI(Mat frame)
+* Сохранение ROI в папке "cropped"
+*/
+void MainWindow::croppedROI(Mat frame)
 {
-    if (!QFile::exists("user.dat") ) {
+    // проверка пользователя
+    if (QFile::exists("user.dat") ) {
 
+        // Создание папки "cropped"
+        if(!QDir("cropped").exists())
+        {
+            QDir().mkdir("cropped");
+        }
+
+        vector<Rect> eyes;
+
+        // Обнаружение глаз
+        eye_cascade.detectMultiScale(frame, eyes, 1.1, 2,
+                                     0 |CV_HAAR_SCALE_IMAGE|CV_HAAR_FIND_BIGGEST_OBJECT, Size(30, 30));
         Mat crop;
         Mat gray;
 
@@ -256,12 +267,6 @@ void MainWindow::croppedROI()
 
         size_t index_biggest_element = 0; // индекс большего элемента
         int area_biggest_element = 0; // площадь большего элемента
-
-        // Создание папки cropped
-        if(!QDir("cropped").exists())
-        {
-            QDir().mkdir("cropped");
-        }
 
         // Сохранение найденной области в .png файл
         for (index_current = 0; index_current < eyes.size(); index_current++)
@@ -304,6 +309,8 @@ void MainWindow::croppedROI()
             QString profileName;
             in >> profileName;
 
+            String profileName_utf8 = profileName.toUtf8().constData();
+
             filenumber++;
 
             // Остановить сохранение при 10 файлах
@@ -312,7 +319,7 @@ void MainWindow::croppedROI()
                 break;
             } else {
                 stringstream ssfilename;
-                ssfilename << folderName << "/" << profileName << "-" << filenumber << "_eye" << ".png";
+                ssfilename << folderName << "/" << profileName_utf8 << "-" << filenumber << "_eye" << ".png";
 
                 filename = ssfilename.str();
 

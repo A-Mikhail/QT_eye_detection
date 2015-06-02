@@ -70,7 +70,7 @@ public slots:
     void detectAndDisplay(cv::Mat frame);
 
     // вырезание области интереса (глаза)
-    void croppedROI();
+    void croppedROI(cv::Mat frame);
 
 private:
     Ui::MainWindow *ui;
