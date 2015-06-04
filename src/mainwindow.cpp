@@ -30,14 +30,27 @@ using namespace cv;
 
 void detectAndDisplay(Mat frame);
 
+// рассчитать хеш картинки
+__int64 calcImageHash(IplImage* image, bool show_results=false);
+// рассчёт расстояния Хэмминга
+__int64 calcHammingDistance(__int64 x, __int64 y);
+
 CascadeClassifier face_cascade;
 CascadeClassifier eye_cascade;
 
-string filename;
-int filenumber = 0;
+string originalImage;
+string temporaryImage;
 
 string folderName;
+string temporaryFolderName;
+
 string folderCreateCommand;
+
+Mat crop;
+Mat gray;
+
+int filenumber = 0;
+
 
 /*
 * MainWindow::MainWindow
@@ -250,13 +263,17 @@ void MainWindow::croppedROI(Mat frame)
             QDir().mkdir("cropped");
         }
 
+        // Создание папки "temporary"
+        if(!QDir("temporary").exists())
+        {
+            QDir().mkdir("temporary");
+        }
+
         vector<Rect> eyes;
 
         // Обнаружение глаз
         eye_cascade.detectMultiScale(frame, eyes, 1.1, 2,
                                      0 |CV_HAAR_SCALE_IMAGE|CV_HAAR_FIND_BIGGEST_OBJECT, Size(30, 30));
-        Mat crop;
-        Mat gray;
 
         // Установка региона интереса
         cv::Rect roi_b;
@@ -299,7 +316,7 @@ void MainWindow::croppedROI(Mat frame)
             crop = frame(roi_b);
             cvtColor(crop, gray, CV_BGR2GRAY); // Конвертация вырезанного изображения в серый цвет
 
-            filename = "";
+            originalImage = "";
             folderName = "cropped";
 
             // Чтение из файла
@@ -309,7 +326,13 @@ void MainWindow::croppedROI(Mat frame)
             QString profileName;
             in >> profileName;
 
+            // Перевод из QString в String
             String profileName_utf8 = profileName.toUtf8().constData();
+
+            stringstream ssoriginalImage;
+            ssoriginalImage << folderName << "/" << profileName_utf8 << "-" << filenumber << "_eye" << ".png";
+
+            originalImage = ssoriginalImage.str();
 
             filenumber++;
 
@@ -318,16 +341,119 @@ void MainWindow::croppedROI(Mat frame)
             {
                 break;
             } else {
-                stringstream ssfilename;
-                ssfilename << folderName << "/" << profileName_utf8 << "-" << filenumber << "_eye" << ".png";
+                imwrite(originalImage, gray);
 
-                filename = ssfilename.str();
+                IplImage *original = 0;
 
-                imwrite(filename, gray);
+                char original_name[] = "C:/Users/micha_000/Desktop/Pr.Alizee/EyeDetection-Build/debug/cropped/Mikhail-1_eye.png";
+
+                // имя объекта задаётся первым параметром
+                char* original_filename = original_name;
+
+                // получаем картинку
+                original = cvLoadImage(original_filename, 1);
+
+                if(!original){
+                        qDebug() << "[!] Error: cant load object image: %s\n" << original_filename;
+                        return;
+                }
+
+                // построим хэш
+                __int64 hashO = calcImageHash(original, true);
+
+                // освобождаем ресурсы
+                cvReleaseImage(&original);
+
+                return;
             }
         }
     }
 }
+
+/*
+void MainWindow::createTemporaryObject()
+{
+    qDebug() << "Создание папки и файла";
+
+    temporaryImage = "";
+    temporaryFolderName = "temporary";
+
+    stringstream sstemporaryImage;
+    sstemporaryImage << temporaryFolderName << "/" << "Temporary_eye" << ".png";
+
+    temporaryImage = sstemporaryImage.str();
+
+    imwrite(temporaryImage, gray);
+}
+*/
+
+
+/*
+ * __int64 calcHammingDistance(__int64 x, __int64 y)
+ * рассчитать хеш картинки
+*/
+__int64 calcImageHash(IplImage* src, bool show_results)
+{
+        IplImage *res=0, *gray=0, *bin =0;
+
+        res = cvCreateImage( cvSize(8, 8), src->depth, src->nChannels);
+        gray = cvCreateImage( cvSize(8, 8), IPL_DEPTH_8U, 1);
+        bin = cvCreateImage( cvSize(8, 8), IPL_DEPTH_8U, 1);
+
+        // уменьшаем картинку
+        cvResize(src, res);
+        // переводим в градации серого
+        cvCvtColor(res, gray, CV_BGR2GRAY);
+        // вычисляем среднее
+        CvScalar average = cvAvg(gray);
+
+        qDebug() << "[i] average: " << average.val[0];
+
+        // получим бинарное изображение относительно среднего
+        // для этого воспользуемся пороговым преобразованием
+        cvThreshold(gray, bin, average.val[0], 255, CV_THRESH_BINARY);
+
+        // построим хэш
+        __int64 hash = 0;
+
+        int i=0;
+
+        // пробегаемся по всем пикселям изображения
+        for( int y=0; y<bin->height; y++ ) {
+                uchar* ptr = (uchar*) (bin->imageData + y * bin->widthStep);
+                for( int x=0; x<bin->width; x++ ) {
+                        // 1 канал
+                        if(ptr[x]){
+                                // hash |= 1<<i;  // warning C4334: '<<' : result of 32-bit shift implicitly converted to 64 bits (was 64-bit shift intended?)
+                                hash |= 1<<i;
+                        }
+                        i++;
+                }
+        }
+
+        qDebug() << "hash: " << hash;
+
+        return hash;
+}
+
+/*
+ * __int64 calcHammingDistance(__int64 x, __int64 y)
+ * рассчёт расстояния Хэмминга между двумя хэшами
+
+__int64 calcHammingDistance(__int64 x, __int64 y)
+{
+        __int64 dist = 0, val = x ^ y;
+
+        // Count the number of set bits
+        while(val)
+        {
+                ++dist;
+                val &= val - 1;
+        }
+
+        return dist;
+}
+*/
 
 /*
  * MainWindow::on_action_about_triggered

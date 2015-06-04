@@ -50,16 +50,17 @@ void optionsWindow::on_toolButton_clicked()
     {
         QFile::remove("user.dat"); // Удаление файла
 
-        // Удаление папки "cropped"
-        QDir("cropped").removeRecursively();
+        QDir("cropped").removeRecursively(); // Удаление папки "cropped"
+
+        // Проверка на отсутствие папки и файла
+        if(!QFile::exists("user.dat") || !QDir("cropped").exists())
+        {
+            QMessageBox::information(this, "Успешно!", "Пользователь успешно удалён!", QMessageBox::Ok);
+        } else {
+            QMessageBox::critical(this, "Ошибка!", "Ошибка удаления пользователя!", QMessageBox::Ok);
+        }
     }
 
-    if(!QFile::exists("user.dat") || !QDir("cropped").exists())
-    {
-        QMessageBox::information(this, "Успешно!", "Пользователь успешно удалён!", QMessageBox::Ok);
-    } else {
-        QMessageBox::critical(this, "Ошибка!", "Ошибка удаления пользователя!", QMessageBox::Ok);
-    }
 
     if(messageBox == QMessageBox::No)
     {

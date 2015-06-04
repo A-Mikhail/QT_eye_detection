@@ -33,7 +33,6 @@ TEMPLATE = app
 
 INCLUDEPATH += D:\OpenCV_withQt\debug\install\include
 INCLUDEPATH += C:\Users\micha_000\Desktop\Pr.Alizee\EyeDetection\src\videoInput\include
-INCLUDEPATH += C:\Users\micha_000\Desktop\physfsCMAKE\SysGCC\include
 
 LIBS += D:\OpenCV_withQt\release\bin\libopencv_core2410.dll
 LIBS += D:\OpenCV_withQt\release\bin\libopencv_contrib2410.dll

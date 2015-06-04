@@ -69,8 +69,11 @@ public slots:
     // Определение области глаз и отображение в окне
     void detectAndDisplay(cv::Mat frame);
 
-    // вырезание области интереса (глаза)
+    // Сохранение области интереса (глаза)
     void croppedROI(cv::Mat frame);
+
+    // Создание и работа с временными объектами (папка, файл)
+    //void createTemporaryObject();
 
 private:
     Ui::MainWindow *ui;
@@ -98,6 +101,7 @@ private:
     QImage qimgOriginal;
 
     QTimer* tmrTimer; 
+    QTimer* identificationTimer;
 };
 
 
