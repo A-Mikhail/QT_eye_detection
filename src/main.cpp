@@ -31,8 +31,10 @@ int main(int argc, char *argv[])
 
     w.show();
 
-    if (!QFile::exists("user.dat") ) {
-       p.show();
+    if (!QFile::exists("user.dat"))
+    {
+        p.setModal(true);
+        p.show();
     }
 
     return a.exec();

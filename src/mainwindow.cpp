@@ -31,7 +31,7 @@ using namespace cv;
 void detectAndDisplay(Mat frame);
 
 // рассчитать хеш картинки
-__int64 calcImageHash(IplImage* image, bool show_results=false);
+__int64 calcImageHash(IplImage* image, bool show_results = false);
 // рассчёт расстояния Хэмминга
 __int64 calcHammingDistance(__int64 x, __int64 y);
 
@@ -345,8 +345,11 @@ void MainWindow::croppedROI(Mat frame)
 
                 IplImage *original = 0;
 
-                char original_name[] = "C:/Users/micha_000/Desktop/Pr.Alizee/EyeDetection-Build/debug/cropped/Mikhail-1_eye.png";
+                char* original_name[] = new char[10];
 
+                char* newOriginal_name = new char[11];
+
+                for(int i = 0; i < 10; i++) newOriginal_name[i] = original[i];
                 // имя объекта задаётся первым параметром
                 char* original_filename = original_name;
 

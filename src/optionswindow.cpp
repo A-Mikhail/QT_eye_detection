@@ -9,6 +9,8 @@ optionsWindow::optionsWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    this->setWindowFlags(this->windowFlags() & ~Qt::WindowContextHelpButtonHint);
+
     // Чтение из файла
     QFile file("user.dat");
     file.open(QIODevice::ReadOnly);
@@ -18,12 +20,6 @@ optionsWindow::optionsWindow(QWidget *parent) :
 
     ui->label_3->setText(profileName); // Текущий пользователь
 }
-
-optionsWindow::~optionsWindow()
-{
-    delete ui;
-}
-
 
 /*
 * optionsWindow::on_toolButton_clicked()
@@ -64,6 +60,11 @@ void optionsWindow::on_toolButton_clicked()
 
     if(messageBox == QMessageBox::No)
     {
-        this->close();
+        return;
     }
+}
+
+optionsWindow::~optionsWindow()
+{
+    delete ui;
 }
