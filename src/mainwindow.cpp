@@ -31,7 +31,7 @@ using namespace cv;
 void detectAndDisplay(Mat frame);
 
 // рассчитать хеш картинки
-__int64 calcImageHash(IplImage* image, bool show_results = false);
+__int64 calcImageHash(IplImage* image, bool show_results=true);
 // рассчёт расстояния Хэмминга
 __int64 calcHammingDistance(__int64 x, __int64 y);
 
@@ -125,6 +125,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     layout->addWidget(aboutButton);
 
+    // Кнопка "Идентификации"
+    identificationButton = new QPushButton("Идентификация", widget);
+    identificationButton->setObjectName("identificationButton");
+
+    connect(identificationButton, SIGNAL(clicked()), this, SLOT(on_action_identification_triggered()));
+
+    layout->addWidget(identificationButton);
+
     // Поле "Веб-камера"
     webcamLabel = new QLabel("Веб-камера: ", widget);
     webcamLabel->setObjectName("webcamLabel");
@@ -171,10 +179,10 @@ void MainWindow::webcamIndex()
         return; // выход
 
     } else {
-        // Инициализация таймера с обновлением в 25fps.
+        // Инициализация таймера с обновлением в 30fps.
         tmrTimer = new QTimer(this);
         connect(tmrTimer, SIGNAL(timeout()), this, SLOT(processFrameAndUpdateGUI()));
-        tmrTimer->start(1000/25);
+        tmrTimer->start(1000/30);
     }
 }
 
@@ -326,8 +334,7 @@ void MainWindow::croppedROI(Mat frame)
             QString profileName;
             in >> profileName;
 
-            // Перевод из QString в String
-            String profileName_utf8 = profileName.toUtf8().constData();
+            String profileName_utf8 = profileName.toUtf8().constData(); // Перевод из QString в String
 
             stringstream ssoriginalImage;
             ssoriginalImage << folderName << "/" << profileName_utf8 << "-" << filenumber << "_eye" << ".png";
@@ -341,31 +348,7 @@ void MainWindow::croppedROI(Mat frame)
             {
                 break;
             } else {
-                imwrite(originalImage, gray);
-
-                IplImage *original = 0;
-
-                char* original_name[] = new char[10];
-
-                char* newOriginal_name = new char[11];
-
-                for(int i = 0; i < 10; i++) newOriginal_name[i] = original[i];
-                // имя объекта задаётся первым параметром
-                char* original_filename = original_name;
-
-                // получаем картинку
-                original = cvLoadImage(original_filename, 1);
-
-                if(!original){
-                        qDebug() << "[!] Error: cant load object image: %s\n" << original_filename;
-                        return;
-                }
-
-                // построим хэш
-                __int64 hashO = calcImageHash(original, true);
-
-                // освобождаем ресурсы
-                cvReleaseImage(&original);
+                imwrite(originalImage, gray); // запись изображений
 
                 return;
             }
@@ -373,11 +356,8 @@ void MainWindow::croppedROI(Mat frame)
     }
 }
 
-/*
-void MainWindow::createTemporaryObject()
+void MainWindow::on_action_identification_triggered()
 {
-    qDebug() << "Создание папки и файла";
-
     temporaryImage = "";
     temporaryFolderName = "temporary";
 
@@ -387,16 +367,82 @@ void MainWindow::createTemporaryObject()
     temporaryImage = sstemporaryImage.str();
 
     imwrite(temporaryImage, gray);
+
+
+    IplImage *object=0, *image=0;
+
+    // Запись изображений в массив
+    originalImage = "";
+    folderName = "cropped";
+
+    // Чтение из файла
+    QFile file("user.dat");
+    file.open(QIODevice::ReadOnly);
+    QDataStream in(&file);
+    QString profileName;
+    in >> profileName;
+
+    String profileName_utf8 = profileName.toUtf8().constData(); // Перевод из QString в String
+
+    // Путь к первому изображению
+    stringstream imagePath;
+    imagePath << folderName << "/" << profileName_utf8 << "-" << "0_eye.png";
+
+    string strImagePaty = imagePath.str();
+
+    // Путь к файлу temporary_eye.png
+    stringstream temporaryImagePath;
+    temporaryImagePath << temporaryFolderName << "/" << "Temporary_eye.png";
+
+    string strTemporaryImagePath = temporaryImagePath.str();
+
+    // получаем картинку
+    object = cvLoadImage(strImagePaty.c_str(), 1);
+    image = cvLoadImage(strTemporaryImagePath.c_str(), 1);
+
+    // ошибка загрузки изображений
+    if(!object){
+        QMessageBox::warning(this, "Ошибка!", "Ошибка загрузки object изображения");
+
+        return;
+    }
+    if (!image)
+    {
+        QMessageBox::warning(this, "Ошибка!", "Ошибка загрузки image изображения");
+
+        return;
+    }
+
+    // хэш
+    __int64 hashO = calcImageHash(object, true);
+    //cvWaitKey(0);
+    __int64 hashI = calcImageHash(image, true);
+
+    // расстояние Хэмминга
+    __int64 dist = calcHammingDistance(hashO, hashI);
+
+    qDebug() << "расстояние Хэмминга: " << dist;
+
+    if (dist < 10)
+    {
+        QMessageBox::information(this, "Информация", "Изображения одинаковы");
+
+    }
+
+    // освобождаем ресурсы
+    cvReleaseImage(&object);
+    cvReleaseImage(&image);
+
+    return;
 }
-*/
 
-
-/*
- * __int64 calcHammingDistance(__int64 x, __int64 y)
- * рассчитать хеш картинки
-*/
+// рассчитать хеш картинки
 __int64 calcImageHash(IplImage* src, bool show_results)
 {
+        if(!src){
+                return 0;
+        }
+
         IplImage *res=0, *gray=0, *bin =0;
 
         res = cvCreateImage( cvSize(8, 8), src->depth, src->nChannels);
@@ -405,12 +451,14 @@ __int64 calcImageHash(IplImage* src, bool show_results)
 
         // уменьшаем картинку
         cvResize(src, res);
+
         // переводим в градации серого
         cvCvtColor(res, gray, CV_BGR2GRAY);
+
         // вычисляем среднее
         CvScalar average = cvAvg(gray);
 
-        qDebug() << "[i] average: " << average.val[0];
+        qDebug() << "среднее значение: " << average.val[0];
 
         // получим бинарное изображение относительно среднего
         // для этого воспользуемся пороговым преобразованием
@@ -427,27 +475,27 @@ __int64 calcImageHash(IplImage* src, bool show_results)
                 for( int x=0; x<bin->width; x++ ) {
                         // 1 канал
                         if(ptr[x]){
-                                // hash |= 1<<i;  // warning C4334: '<<' : result of 32-bit shift implicitly converted to 64 bits (was 64-bit shift intended?)
-                                hash |= 1<<i;
+                            hash |= 1<<i;
                         }
                         i++;
                 }
         }
 
-        qDebug() << "hash: " << hash;
+        qDebug() << "хэш: " << hash;
+
+        // освобождаем ресурсы
+        cvReleaseImage(&res);
+        cvReleaseImage(&gray);
+        cvReleaseImage(&bin);
 
         return hash;
 }
 
-/*
- * __int64 calcHammingDistance(__int64 x, __int64 y)
- * рассчёт расстояния Хэмминга между двумя хэшами
-
+// рассчёт расстояния Хэмминга между двумя хэшами
 __int64 calcHammingDistance(__int64 x, __int64 y)
 {
         __int64 dist = 0, val = x ^ y;
 
-        // Count the number of set bits
         while(val)
         {
                 ++dist;
@@ -456,7 +504,6 @@ __int64 calcHammingDistance(__int64 x, __int64 y)
 
         return dist;
 }
-*/
 
 /*
  * MainWindow::on_action_about_triggered

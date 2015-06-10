@@ -22,8 +22,35 @@
 #include "mainwindow.h"
 #include "popupwindow.h"
 
+
+void myMessageOutput(QtMsgType type, const QMessageLogContext &, const QString & str)
+{
+    const char * msg = str.toStdString().c_str();
+
+    FILE *file; // указатель на файл, в который пишем
+    file = fopen("file.log", "a"); // открываем файл на запись
+        switch (type) {
+        case QtDebugMsg:
+            fprintf(file, "Debug: %s\n", msg);
+            break;
+        case QtWarningMsg:
+            fprintf(file, "Warning: %s\n", msg);
+            break;
+        case QtCriticalMsg:
+            fprintf(file, "Critical: %s\n", msg);
+            break;
+        case QtFatalMsg:
+            fprintf(file, "Fatal: %s\n", msg);
+            abort();
+     }
+
+    fclose(file); // закрываем файл
+ }
+
 int main(int argc, char *argv[])
 {
+    qInstallMessageHandler(myMessageOutput);
+
     QApplication a(argc, argv);
 
     popupWindow p;

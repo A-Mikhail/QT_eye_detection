@@ -53,7 +53,9 @@ LIBS += C:\Users\micha_000\Desktop\Pr.Alizee\EyeDetection\src\videoInput\strmiid
 LIBS += C:\Users\micha_000\Desktop\Pr.Alizee\EyeDetection\src\videoInput\uuid.lib
 
 QMAKE_CXXFLAGS += -std=c++11
-CONFIG += precompile_header \
+
+CONFIG += precompile_header
+
 
 PRECOMPILED_HEADER = stdafx.h
 

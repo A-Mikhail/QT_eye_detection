@@ -17,6 +17,10 @@ QPushButton#aboutButton {
     border: 0;
     height: 35%;
 }
+QPushButton#identificationButton {
+    border: 0;
+    height: 35%;
+}
 
 QLabel#webcamLabel {
     qproperty-alignment: 'AlignCenter | AlignRight';
@@ -31,6 +35,10 @@ QComboBox {
 
 /* hover */
 QPushButton#exitButton:hover {
+    border-bottom: 3px solid #335566;
+}
+
+QPushButton#identificationButton:hover {
     border-bottom: 3px solid #335566;
 }
 
@@ -57,6 +65,12 @@ QPushButton#aboutButton:pressed {
     color: #335566;
     border-bottom: 3px solid #335566;
 }
+
+QPushButton#identificationButton:pressed {
+    color: #335566;
+    border-bottom: 3px solid #335566;
+}
+
 
 
 

@@ -55,6 +55,8 @@ private slots:
     // Нажатие кнопки "Настройки"
     void on_action_settings_triggered();
 
+    void on_action_identification_triggered();
+
 public slots:   
 
     // Индекс выбранной веб-камеры
@@ -88,6 +90,7 @@ private:
     QPushButton* exitButton;
     QPushButton* settingsButton;
     QPushButton* aboutButton;
+    QPushButton* identificationButton;
 
     QLabel* webcamLabel;
     QComboBox* combobox;
