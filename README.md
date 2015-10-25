@@ -3,7 +3,7 @@
 	<img src="http://i.imgur.com/pubJVQs.png" title="source: imgur.com" align="top"/>
 </figure>
 <br/>
-<p>Eye detection using haarcascade, written in C++ with Qt and OpenCV.</p>
+<p>EyeDetection using haarcascade, written on c++ language in Qt, uses OpenCV library and include lot of bugs.</p>
 
 # To-Do list:
 
